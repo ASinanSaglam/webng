@@ -31,12 +31,6 @@ end species
 begin observables
     Molecules Atot A()
     Molecules Btot B()
-    Molecules GA00tot GeneA_00()
-    Molecules GA01tot GeneA_01()
-    Molecules GA10tot GeneA_10()
-    Molecules GB00tot GeneB_00()
-    Molecules GB01tot GeneB_01()
-    Molecules GB10tot GeneB_10()
 end observables
 begin reaction rules
     GeneA_00() + A() + A() <-> GeneA_10() ha, fa
@@ -53,9 +47,3 @@ begin reaction rules
     B() -> 0 k
 end reaction rules
 end model
-
-#ACTIONS
-simulate_ode({t_start=>0,t_end=>1000000,n_steps=>1000});
-#visualize({type=>"contactmap"})
-#visualize({type=>"ruleviz_pattern"})
-#visualize({type=>"ruleviz_operation"})
