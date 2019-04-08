@@ -59,7 +59,7 @@ This should create a folder named after the folder name you choose in the yaml f
 ./run.sh --n-workers X
 ```
 where X is the number of cores you want WESTPA to use. This took about 15 minutes on 4 cores for me on a Xeon @3.5GHz. 
-https://github.com/ASinanSaglam/BNG_WESTPA_pipeline/issues
+
 7. Once the simulation is complete, you can either move the analysis folder or copy the files ```west.h5``` and ```system.py``` to the analysis folder (named WESTPA_BNG_analysis) and run all of the analysis using the following command: 
 
 ```
