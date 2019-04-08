@@ -48,6 +48,21 @@ cd BNG_WESTPA_pipeline
 5. Now you are ready to setup a WESTPA simulation. You should edit the opts.yaml example file provided and point to WESTPA, BioNetGen and the .bngl model file you want to simulate. Here you can also edit the WE sampling options. 
 
 ```
+path_options:
+  sim_name: "test_simulation“ – Simulation folder 
+  bngl_file: "/home/monoid/PROJECTS/bngl-to-westpa/sample.bngl“ – BNGL file 
+  bng_path: "/home/monoid/apps/BioNetGen-2.3.2/“ – Where is BNG installed? 
+  WESTPA_path: "/home/monoid/apps/westpa/“ – Where is WESTPA installed?
+sampling_options:
+  tau: 20 – Resampling frequency
+  dimensions: 12 – Dimensionality of the WESTPA progress coordinates
+  pcoord_length: 2 – Number of data points per WE iteration
+  max_iter: 100 – Maximum number of WE iterations
+binning_options: 
+  traj_per_bin: 10 – Number of trajectories per Voronoi center
+  block_size: 10 – Number of trajectories to be processed in blocks
+  center_freq: 1 – How frequently do we add new Voronoi centers?
+  max_centers: 300 – Maximum number of Voronoi centers to be added
 ```
 
 This should create a folder named after the folder name you choose in the yaml file. 
