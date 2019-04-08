@@ -1,4 +1,7 @@
-BioNetGen and WESTPA pipeline
+# BioNetGen and WESTPA pipeline
+
+* TODO: Add a docker image
+* TODO: Add explanations of the YAML file
 
 This pipeline requires [BioNetGen](https://www.csb.pitt.edu/Faculty/Faeder/?page_id=409) and [WESTPA](https://github.com/westpa/westpa) already installed on the machine you want to run the simulation on, I suggest using the [Anaconda python distribution](https://www.anaconda.com/download/) for WESTPA as well. For some of the analysis an additional requirement is [PyEMMA](http://emma-project.org/latest/). I suggest following the Jupyter notebook provided in the main folder of this repo to understand how to use the pipeline. 
   
@@ -38,7 +41,6 @@ and make sure it points to the anaconda python 2.7 you installed.
 
 5. Once the setup is complete, clone this repo:
 ```
-cd lib/examples
 git clone https://github.com/ASinanSaglam/BNG_WESTPA_pipeline.git
 cd BNG_WESTPA_pipeline
 ```
