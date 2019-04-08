@@ -1,8 +1,5 @@
 # BioNetGen and WESTPA pipeline
 
-* TODO: Add a docker image
-* TODO: Add explanations of the YAML file
-
 This pipeline requires [BioNetGen](https://www.csb.pitt.edu/Faculty/Faeder/?page_id=409) and [WESTPA](https://github.com/westpa/westpa) already installed on the machine you want to run the simulation on, I suggest using the [Anaconda python distribution](https://www.anaconda.com/download/) for WESTPA as well. For some of the analysis an additional requirement is [PyEMMA](http://emma-project.org/latest/). I suggest following the Jupyter notebook provided in the main folder of this repo to understand how to use the pipeline. 
   
 I suggest using the following instructions (especially for Linux) for acquiring and installing dependencies: 
@@ -89,3 +86,5 @@ where X is the number of cores you want WESTPA to use. This took about 15 minute
 where the first argument is the number of iterations the averaging of all the analysis start from and the second argument is the number of clusters you want. Please note, depending on the model you have used and/or the convergence of your simulation, PCCA+ clustering might not work because it expects a reversible transition matrix, see [here](http://www.emma-project.org/v2.4/api/generated/pyemma.msm.PCCA.html) for more information. You can try to get around this issue by skipping this check but that requires the modification of PyEMMA code and it's beyond the scope of this tutorial.
 
 7. This repo is still heavily under construction, please let me know if you have any issues by reporting your issue under [github issues page](https://github.com/ASinanSaglam/BNG_WESTPA_pipeline/issues).
+
+* TODO: Add a docker image
