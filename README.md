@@ -1,20 +1,6 @@
-2018 WESTPA Workshop tutorial by Ali Sinan Saglam, uses WESTPA and BioNetGen
+BioNetGen and WESTPA pipeline
 
-This is a mostly self-contained tutorial to run BNG simulations coupled with WESTPA and some example analysis that can be done. There are two components, the main folder contains a sample simulation that can be ran once placed under a WESTPA installation and a [Jupyter notebook containing sample analysis](https://github.com/ASinanSaglam/WESTPA_Workshop_2018_Saglam/blob/master/analysis/analysis.ipynb).
-
-Instructions: 
-* There are two options to run this tutorial, you can either run a [docker](https://www.docker.com/community-edition) container or build the dependencies. For docker, first install docker software then follow these instructions:
-  * To download image do ```docker pull asinansaglam/westpa_workshop```
-  * If you just want to run the simulation do ```docker run -it asinansaglam/westpa_workshop```, then you can follow step 5 to run the simulation
-  * If you also want to run the Jupyter notebook do ```docker run -it -p 8888:8888 asinansaglam/westpa_workshop``` when running the docker image and when you are running the notebook do ```./docker_notebook.sh``` which is just running the following ```jupyter notebook --ip="*" --port=8888 --no-browser --notebook-dir=$PWD --allow-root```. 
-    * Depending if you are running a docker VM or not these options might change slightly. Then you can go to ```http://localhost:8888``` or ```http://<DOCKER_MACHINE_IP>:8888``` to get to your Jupyter notebook. 
-    * If the notebook is asking for a key you can copy paste the token given to you once you start up the Jupyter notebook. 
-
-* If you want to build the dependencies you will need:
-  * [Anaconda python distribution](https://www.anaconda.com/download/)
-  * [WESTPA](https://github.com/westpa/westpa)
-  * [PyEMMA](http://emma-project.org/latest/INSTALL.html)
-  * [BioNetGen](https://www.csb.pitt.edu/Faculty/Faeder/?page_id=409). A statically compiled binary is included in this tutorial.
+This pipeline requires [BioNetGen](https://www.csb.pitt.edu/Faculty/Faeder/?page_id=409) and [WESTPA](https://github.com/westpa/westpa) already installed on the machine you want to run the simulation on, I suggest using the [Anaconda python distribution](https://www.anaconda.com/download/) for WESTPA as well. For some of the analysis an additional requirement is [PyEMMA](http://emma-project.org/latest/). I suggest following the Jupyter notebook provided in the main folder of this repo to understand how to use the pipeline. 
   
 I suggest using the following instructions (especially for Linux) for acquiring and installing dependencies: 
 
@@ -48,30 +34,36 @@ which python
 ```
 and make sure it points to the anaconda python 2.7 you installed.
 
-4. Once the setup is complete, navigate to the examples folder and clone the tutorial:
+4. Install BioNetGen from and untar the folder, this is the folder you will point to later on (the one that contains the file BNG2.pl)
+
+5. Once the setup is complete, clone this repo:
 ```
 cd lib/examples
-git clone https://github.com/ASinanSaglam/WESTPA_Workshop_2018_Saglam.git
-cd WESTPA_Workshop_2018_Saglam
+git clone https://github.com/ASinanSaglam/BNG_WESTPA_pipeline.git
+cd BNG_WESTPA_pipeline
 ```
 
-5. Now the simulation is ready! By default the number of iterations is set to 100 which can be changed by editing "west.cfg" file. You can run the simulation with:
+5. Now you are ready to setup a WESTPA simulation. You should edit the opts.yaml example file provided and point to WESTPA, BioNetGen and the .bngl model file you want to simulate. Here you can also edit the WE sampling options. 
+
+```
+```
+
+This should create a folder named after the folder name you choose in the yaml file. 
+
+6. You can now navigate to the WESTPA simulation folder. The following commands should run the simulation. 
+
 ```
 ./init.sh
 ./run.sh --n-workers X
 ```
-where X is the number of cores you want WESTPA to use. This took about 15 minutes on 4 cores for me on a Xeon @3.5GHz. Some of the analysis will expect 100 iterations, you might have to adjust the notebook if you run less and decide to use your own data. The analysis/pre-prepped_results folder contains all the files you will need for analysis in case something goes wrong with the simulation or if you just want to see the analysis.
+where X is the number of cores you want WESTPA to use. This took about 15 minutes on 4 cores for me on a Xeon @3.5GHz. 
+https://github.com/ASinanSaglam/BNG_WESTPA_pipeline/issues
+7. Once the simulation is complete, you can either move the analysis folder or copy the files ```west.h5``` and ```system.py``` to the analysis folder (named WESTPA_BNG_analysis) and run all of the analysis using the following command: 
 
-Optional note for 2018 workshop attendees: If you are coming to the 2018 WESTPA workshop and interested in systems biology, you will have temporary access to the [H2P cluster](https://crc.pitt.edu/h2p) for the workshop simulations. You can follow almost the same instructions up to this point in the cluster. To run the simulation, just edit env.sh to uncomment the two variable definitions SCRATCH and make sure WEST_PYTHON points directly to the Anaconda python you installed. Once that is done you can simply submit the job with ```sbatch run_H2P.sh``` to run the simulation on a single node with 48 cores. For non-attendees this is also a sample submittion script for single node jobs. Note, to make use of multi-node simulations, you will have to use other work managers. Please visit [the WESTPA wiki](https://github.com/westpa/westpa/wiki/Running-WESTPA-in-a-multi-node-environment) for more information. 
-
-6. Once the simulation is complete, navigate to the analysis folder and run all of the analysis on either the master h5 file you generated (../west.h5) or the pre-calculated one I provide (pre-prepped_results/west.h5)
 ```
-cd analysis
-./run_all_analysis.sh ../west.h5
+./run_all_analysis.sh 4
 ```
 
-7. Finally, you can take a look at the Jupyter notebook that goes with this tutorial by running the following when you are in the analysis folder:
-```
-jupyter notebook
-```
-Jupyter comes with Anaconda python so you don't need to install it. Once you have the notebook running on a browser and you are on the file navigator screen, open analysis.ipynb to access the analysis notebook.
+where the argument is the number of clusters you want. Please note, depending on the model you have used and/or the convergence of your simulation, PCCA+ clustering might not work because it expects a reversible transition matrix, see [here](http://www.emma-project.org/v2.4/api/generated/pyemma.msm.PCCA.html) for more information. You can try to get around this issue by skipping this check but that requires the modification of PyEMMA code and it's beyond the scope of this pipeline.
+
+7. This repo is still heavily under construction, please let me know if you have any issues by reporting your issue under [github issues page](https://github.com/ASinanSaglam/BNG_WESTPA_pipeline/issues).
