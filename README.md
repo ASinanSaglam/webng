@@ -49,10 +49,10 @@ cd BNG_WESTPA_pipeline
 
 ```
 path_options:
-  sim_name: "test_simulation“ – Simulation folder 
-  bngl_file: "/home/monoid/PROJECTS/bngl-to-westpa/sample.bngl“ – BNGL file 
-  bng_path: "/home/monoid/apps/BioNetGen-2.3.2/“ – Where is BNG installed? 
-  WESTPA_path: "/home/monoid/apps/westpa/“ – Where is WESTPA installed?
+  sim_name: "test_simulation" – Simulation folder 
+  bngl_file: "/home/monoid/PROJECTS/bngl-to-westpa/sample.bngl" – BNGL file 
+  bng_path: "/home/monoid/apps/BioNetGen-2.3.2/" – Where is BNG installed? 
+  WESTPA_path: "/home/monoid/apps/westpa/" – Where is WESTPA installed?
 sampling_options:
   tau: 20 – Resampling frequency
   dimensions: 12 – Dimensionality of the WESTPA progress coordinates
