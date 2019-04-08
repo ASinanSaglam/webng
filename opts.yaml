@@ -1,0 +1,17 @@
+# vi: set filetype=yaml :
+---
+path_options:
+  sim_name: "test_simulation"
+  bngl_file: "/home/monoid/PROJECTS/bngl-to-westpa/sample.bngl"
+  bng_path: "/home/monoid/apps/BioNetGen-2.3.2/"
+  WESTPA_path: "/home/monoid/apps/westpa/"
+sampling_options:
+  tau: 20
+  dimensions: 12
+  pcoord_length: 2
+  max_iter: 100
+binning_options: 
+  traj_per_bin: 10
+  block_size: 10
+  center_freq: 1
+  max_centers: 300

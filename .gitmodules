@@ -1,0 +1,3 @@
+[submodule "WESTPA_BNG_analysis"]
+	path = WESTPA_BNG_analysis
+	url = https://github.com/ASinanSaglam/WESTPA_BNG_analysis
