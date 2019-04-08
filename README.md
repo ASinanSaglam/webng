@@ -64,6 +64,11 @@ binning_options:
   center_freq: 1 – How frequently do we add new Voronoi centers?
   max_centers: 300 – Maximum number of Voronoi centers to be added
 ```
+You can now run the script using
+
+```
+python bng_to_we.py -opts opts.yaml
+```
 
 This should create a folder named after the folder name you choose in the yaml file. 
 
@@ -81,6 +86,6 @@ where X is the number of cores you want WESTPA to use. This took about 15 minute
 ./run_all_analysis.sh 1 4
 ```
 
-where the first argument is the number of iterations the averaging of all the analysis start from and the second argument is the number of clusters you want. Please note, depending on the model you have used and/or the convergence of your simulation, PCCA+ clustering might not work because it expects a reversible transition matrix, see [here](http://www.emma-project.org/v2.4/api/generated/pyemma.msm.PCCA.html) for more information. You can try to get around this issue by skipping this check but that requires the modification of PyEMMA code and it's beyond the scope of this pipeline.
+where the first argument is the number of iterations the averaging of all the analysis start from and the second argument is the number of clusters you want. Please note, depending on the model you have used and/or the convergence of your simulation, PCCA+ clustering might not work because it expects a reversible transition matrix, see [here](http://www.emma-project.org/v2.4/api/generated/pyemma.msm.PCCA.html) for more information. You can try to get around this issue by skipping this check but that requires the modification of PyEMMA code and it's beyond the scope of this tutorial.
 
 7. This repo is still heavily under construction, please let me know if you have any issues by reporting your issue under [github issues page](https://github.com/ASinanSaglam/BNG_WESTPA_pipeline/issues).
