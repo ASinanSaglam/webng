@@ -1,17 +1,4 @@
-# vi: set filetype=yaml :
----
-path_options:
-  sim_name: "WESTPA_sim"
-  bngl_file: "test.bngl"
-  bng_path: "/PATH/TO/BNG/FOLDER"
-  WESTPA_path: "/PATH/TO/WESTPA/FOLDER"
-sampling_options:
-  tau: 100
-  dimensions: 2
-  pcoord_length: 10
-  max_iter: 100
-binning_options: 
-  traj_per_bin: 100
-  block_size: 10
-  center_freq: 1
-  max_centers: 300
+binning_options: {block_size: 10, center_freq: 1, max_centers: 300, traj_per_bin: 100}
+path_options: {WESTPA_path: /home/monoid/apps/westpa, bng_path: /home/monoid/apps/BioNetGen-2.4.0,
+  bngl_file: /home/monoid/Development/BNG_WESTPA_pipeline/test.bngl, sim_name: /home/monoid/Development/BNG_WESTPA_pipeline/test_sim}
+sampling_options: {dimensions: 2, max_iter: 100, pcoord_length: 10, tau: 100}
