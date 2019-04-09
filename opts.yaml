@@ -1,4 +1,4 @@
 binning_options: {block_size: 10, center_freq: 1, max_centers: 300, traj_per_bin: 100}
 path_options: {WESTPA_path: /home/monoid/apps/westpa, bng_path: /home/monoid/apps/BioNetGen-2.4.0,
   bngl_file: /home/monoid/Development/BNG_WESTPA_pipeline/test.bngl, sim_name: /home/monoid/Development/BNG_WESTPA_pipeline/test_sim}
-sampling_options: {dimensions: 2, max_iter: 100, pcoord_length: 10, tau: 100}
+sampling_options: {dimensions: 2, max_iter: 10, pcoord_length: 10, tau: 100}
