@@ -77,7 +77,14 @@ This should create a folder named after the folder name you choose in the yaml f
 ```
 where X is the number of cores you want WESTPA to use. This took about 15 minutes on 4 cores for me on a Xeon @3.5GHz. 
 
-7. Once the simulation is complete, you can either move the analysis folder or copy the files ```west.h5``` and ```system.py``` to the analysis folder (named WESTPA_BNG_analysis) and run all of the analysis using the following command: 
+7. Once the simulation is complete, initialize the analysis folder with the following under the main repo folder
+
+```
+git submodule init
+git submodule update
+```
+
+Then you can either move the analysis folder or copy the files ```west.h5``` and ```system.py``` to the analysis folder (named WESTPA_BNG_analysis) and run all of the analysis using the following command: 
 
 ```
 ./run_all_analysis.sh 1 4
