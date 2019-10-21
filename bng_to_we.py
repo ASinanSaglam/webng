@@ -166,7 +166,7 @@ class BNGL_TO_WE:
         '        for iseg, segment in enumerate(segments):\n',
         '            # print(piter,segment.parent_state)\n',
         '            starttime = time.time()\n',
-        '            seed = random.randint(0,2**16)\n',
+        '            seed = random.randint(0,2**14)\n',
         '            # Make sure we are reset so we can set the init state by hand\n',
         '            self.runner.reset()\n',
         '            # Set a new seed\n',
