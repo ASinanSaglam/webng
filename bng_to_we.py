@@ -28,6 +28,11 @@ class BNGL_TO_WE:
         '''
         # Set the main directory we are in 
         self.main_dir = os.getcwd()
+        # Propagator options
+        propagator_options = self._getd(self.opts, "propagator_options")
+        self.propagator_type = self._getd(propagator_options, "propagator_type", default="executable")
+        if self.propagator_type == "libRoadRunner":
+            self.pcoord_list = self._getd(propagator_options, "pcoords")
         # we need to find WESTPA and BNG
         path_options = self._getd(self.opts, "path_options")
         self.WESTPA_path = self._getd(path_options, "WESTPA_path")
@@ -79,6 +84,158 @@ class BNGL_TO_WE:
         y = yaml.load(f)
         f.close()
         return y
+    
+    def _write_librrPropagator(self):
+        lines = [
+        'from __future__ import division, print_function; __metaclass__ = type\n',
+        'import numpy as np\n',
+        'import west, copy, time, random\n',
+        'from west.propagators import WESTPropagator\n',
+        'import roadrunner as librr\n',
+        'import logging\n',
+        'log = logging.getLogger(__name__)\n',
+        'log.debug(\'loading module %r\' % __name__)\n',
+        '# We want to write the librrPropagator here\n',
+        '# TODO: We need to figure out how to\n',
+        '# 1) Start up libRR instances and never let them die until we are done\n',
+        '# 2) Have "propagate" method reset the state, update the concs and then run the SSA\n',
+        '# 3) For now skip gen_istate and we\'ll implement that later, probably not very relevant\n',
+        '# 4) What else do we need?\n',
+        'class librrPropagator(WESTPropagator):\n',
+        '    def __init__(self, rc=None):\n',
+        '        super(librrPropagator,self).__init__(rc)\n',
+        '        # Get the rc file stuff\n',
+        '        config = self.rc.config\n',
+        '        for key in [(\'west\',\'librr\',\'init\',\'model_file\'),\n'
+        '                    (\'west\',\'librr\',\'init\',\'init_time_step\'),\n',
+        '                    (\'west\',\'librr\',\'init\',\'final_time_step\'),\n',
+        '                    (\'west\',\'librr\',\'init\',\'num_time_step\'),\n',
+        '                    (\'west\',\'librr\',\'data\',\'pcoords\')]:\n',
+        '            config.require(key)\n',
+        '        self.runner_config = {}\n',
+        '        self.runner_config[\'model_file\'] = config[\'west\',\'librr\',\'init\',\'model_file\']\n',
+        '        self.runner_config[\'init_ts\'] = config[\'west\',\'librr\',\'init\',\'init_time_step\']\n',
+        '        self.runner_config[\'final_ts\'] = config[\'west\',\'librr\',\'init\',\'final_time_step\']\n',
+        '        self.runner_config[\'num_ts\'] = config[\'west\',\'librr\',\'init\',\'num_time_step\']\n',
+        '        self.runner_config[\'pcoord_keys\'] = config[\'west\',\'librr\',\'data\',\'pcoords\']\n',
+        '        # Initialize the libRR propagator using the init file\n',
+        '        # Note: We COULD use a string, meaning we can save that to the \n',
+        '        # h5file and just pull the string out? I should look into this\n',
+        '        self.runner = librr.RoadRunner(self.runner_config[\'model_file\'])\n',
+        '        self.runner.setIntegrator("gillespie")\n',
+        '        self.runner.setIntegratorSetting(\'gillespie\', \'variable_step_size\', False)\n',
+        '        self.runner.setIntegratorSetting(\'gillespie\', \'nonnegative\', True)\n',
+        '        self.pcoord_indices = self.find_pcoord_indices()\n',
+        '        self.initial_pcoord = self.get_initial_pcoords()\n',
+        '        self.full_state_keys = self.get_full_state_keys()\n',
+        '    # Overwriting inhereted methods\n',
+        '    def get_pcoord(self, state):\n',
+        '        state.pcoord = copy.copy(self.initial_pcoord)\n',
+        '        return\n',
+        '    def gen_istate(self, basis_state, initial_state):\n',
+        '        return initial_state\n',
+        '    # Rest is original class methods, except for propagate ofc\n',
+        '    def get_initial_pcoords(self):\n',
+        '        return [self.runner[x] for x in self.runner_config[\'pcoord_keys\']]\n',
+        '    def find_pcoord_indices(self):\n',
+        '        inds = []\n',
+        '        for ikey, key in enumerate(self.runner.timeCourseSelections):\n',
+        '            if key in self.runner_config[\'pcoord_keys\']:\n',
+        '                inds.append(ikey)\n',
+        '        return np.array(inds)\n',
+        '    def get_current_pcoords(self, result):\n',
+        '        # Gets the current values of the pcoords set\n',
+        '        # TODO: Experiment with RR to figure out how this works\n',
+        '        return np.array(result[:,self.pcoord_indices])\n',
+        '    def get_full_state_keys(self):\n',
+        '        # TODO: Is this the best way? More importantly, is this the correct way?\n',
+        '        # since RR timecourses are just concs and not the values themselves,\n',
+        '        # we probably have to find a way to pull everything that are not constants\n',
+        '        fs = self.runner.getFloatingSpeciesAmountsNamedArray().colnames\n',
+        '        concs = ["["+x+"]" for x in fs]\n',
+        '        return fs+concs\n',
+        '    def get_final_state(self):\n',
+        '        # gets the final state info in full to be used by set_concs later\n',
+        '        return [self.runner[x] for x in self.full_state_keys]\n',
+        '    def set_runner_state(self, state):\n',
+        '        for ival, val in enumerate(state):\n',
+        '            self.runner.setValue(self.full_state_keys[ival], val)\n',
+        '    def propagate(self, segments):\n',
+        '        piter = segments[0].n_iter-1\n',
+        '        # Set some init states for segments\n',
+        '        for iseg, segment in enumerate(segments):\n',
+        '            # print(piter,segment.parent_state)\n',
+        '            starttime = time.time()\n',
+        '            seed = random.randint(0,2**16)\n',
+        '            # Make sure we are reset so we can set the init state by hand\n',
+        '            self.runner.reset()\n',
+        '            # Set a new seed\n',
+        '            self.runner.setIntegratorSetting(\'gillespie\', \'seed\', seed)\n',
+        '            # Deal with init state here\n',
+        '            # if segment.initpoint_type == Segment.SEG_INITPOINT_CONTINUES:\n',
+        '            #     pass\n',
+        '            # elif segment.initpoint_type == Segment.SEG_INITPOINT_NEWTRAJ:\n',
+        '            #     pass\n',
+        '            if piter > 0:\n',
+        '                self.set_runner_state(segment.data[\'restart_state\'])\n',
+        '            # now we simulate using given parameters\n',
+        '            result = self.runner.simulate(self.runner_config[\'init_ts\'], \n',
+        '                                          self.runner_config[\'final_ts\'],\n',
+        '                                          self.runner_config[\'num_ts\'])\n',
+        '            # We need to store the current state of everything in the system\n',
+        '            # so we can set it \n',
+        '            segment.data[\'final_state\'] = self.get_final_state()\n',
+        '            segment.data[\'seed\'] = seed\n',
+        '            # Get segment pcoords\n',
+        '            segment.pcoord = self.get_current_pcoords(result)\n',
+        '            # TODO: calc cputime somehow\n',
+        '            segment.walltime = time.time() - starttime\n',
+        '            segment.cputime = 0\n',
+        '            segment.status = segment.SEG_STATUS_COMPLETE\n',
+        '        return segments\n']
+        with open("libRR_propagator.py", "w") as f:
+            f.writelines(lines)
+
+    def _write_restartDriver(self):
+        lines = [
+            'from __future__ import division; __metaclass__ = type',
+            'import logging',
+            'log = logging.getLogger(__name__)',
+            'class RestartDriver(object):',
+            '    def __init__(self, sim_manager, plugin_config):',
+            '        super(RestartDriver, self).__init__()',
+            '        if not sim_manager.work_manager.is_master:',
+            '                return',
+            '        self.sim_manager = sim_manager',
+            '        self.data_manager = sim_manager.data_manager',
+            '        self.system = sim_manager.system',
+            '        self.priority = plugin_config.get(\'priority\', 0)',
+            '        # Register callback',
+            '        sim_manager.register_callback(sim_manager.pre_propagation, self.pre_propagation, self.priority)',
+            '    def pre_propagation(self):',
+            '        segments = self.sim_manager.incomplete_segments.values()',
+            '        n_iter = self.sim_manager.n_iter',
+            '        if n_iter == 1:',
+            '            return',
+            '        parent_iter_group = self.data_manager.get_iter_group(n_iter - 1)',
+            '        # Get parent ids for segments',
+            '        parent_ids = [seg.parent_id for seg in segments]',
+            '        # Get a list of unique parent ids and collect restart data for each',
+            '        unique_parent_ids = set(parent_ids)',
+            '        restart_data = {segid: {} for segid in unique_parent_ids}',
+            '        for dsname in [\'final_state\', \'seed\']:',
+            '            try:',
+            '                dsinfo = self.data_manager.dataset_options[dsname]',
+            '            except KeyError:',
+            '                raise KeyError(\'Data set {} not found\'.format(dsname))',
+            '            ds = parent_iter_group[dsinfo[\'h5path\']]',
+            '            for seg_id in unique_parent_ids:',
+            '                restart_data[seg_id][dsname] = ds[seg_id]',
+            '        for segment in segments:',
+            '            segment.data[\'restart_state\'] = restart_data[segment.parent_id][\'final_state\']']
+        full_text = "\n".join(lines)
+        with open("restart_plugin.py", "w") as f:
+            f.write(full_text)
 
     def _write_runsh(self):
         '''
@@ -243,12 +400,10 @@ class BNGL_TO_WE:
             '        self.pcoord_len = {}\n'.format(self.plen+1),
             '        self.pcoord_dtype = np.float32\n',
             '        self.nbins = 1\n',
-            '\n',
             '        centers = np.zeros((self.nbins,self.pcoord_ndim),dtype=self.pcoord_dtype)\n',
             '        # Using the values from the inital point\n',
             '        i = np.loadtxt(\'bngl_conf/init.gdat\')\n',
             '        centers[0] = i[1:]\n',
-            '\n',
             '        self.bin_mapper = VoronoiBinMapper(dfunc, centers)\n',
             '        self.bin_target_counts = np.empty((self.bin_mapper.nbins,), np.int)\n',
             '        self.bin_target_counts[...] = {}\n'.format(self.traj_per_bin)
@@ -263,6 +418,57 @@ class BNGL_TO_WE:
         the WESTPA configuration file, another YAML file
         '''
         # TODO: Expose max wallclock time?
+        if self.propagator_type == "executable":
+            self._executable_westcfg()
+        elif self.propagator_type == "libRoadRunner":
+            self._libRR_westcfg()
+
+    def _libRR_westcfg(self):
+        step_len = self.tau/self.plen
+        step_no = self.plen
+
+        lines = [
+            '# vi: set filetype=yaml :\n',
+            '---\n',
+            'west: \n',
+            '  system:\n',
+            '    driver: system.System\n',
+            '    module_path: $WEST_SIM_ROOT\n',
+            '  propagation:\n',
+            '    max_total_iterations: {}\n'.format(self.max_iter),
+            '    max_run_wallclock:    72:00:00\n',
+            '    propagator:           libRR_propagator.librrPropagator \n',
+            '    gen_istates:          false\n',
+            '    block_size:           {}\n'.format(self.block_size),
+            '  data:\n',
+            '    west_data_file: west.h5\n',
+            '    datasets:\n',
+            '      - name:        pcoord\n',
+            '        scaleoffset: 4\n',
+            '      - name:        seed\n',
+            '        scaleoffset: 4\n',
+            '      - name:        final_state \n',
+            '        scaleoffset: 4\n',
+            '  plugins:\n',
+            '    - plugin: westext.adaptvoronoi.AdaptiveVoronoiDriver\n',
+            '      av_enabled: true\n',
+            '      dfunc_method: system.dfunc\n',
+            '      walk_count: {}\n'.format(self.traj_per_bin),
+            '      max_centers: {}\n'.format(self.max_centers),
+            '      center_freq: {}\n'.format(self.center_freq),
+            '    - plugin: restart_plugin.RestartDriver\n',
+            '  librr:\n',
+            '    init:\n',
+            '      model_file: {} # Generate this\n'.format(os.path.join(self.main_dir, self.fname, "bngl_conf","init.xml")),
+            '      init_time_step: 0\n',
+            '      final_time_step: {}\n'.format(self.tau),
+            '      num_time_step: {}\n'.format(step_no),
+            '    data:\n',
+            '      pcoords: {}\n'.format(('["'+'","'.join(self.pcoord_list)+'"]'))] # TODO: Write pcoords
+        with open("west.cfg", "w") as f:
+            f.writelines(lines)
+
+    def _executable_westcfg(self):
         lines = [
             '# vi: set filetype=yaml :\n',
             '---\n',
@@ -372,7 +578,6 @@ class BNGL_TO_WE:
             '  $RunNet -o ./seg -p ssa -h $WEST_RAND16 --cdat 0 --fdat 0 -e -g ./parent.net ./parent.net {} {}\n'.format(step_len, step_no),
             '  cat seg.gdat > $WEST_PCOORD_RETURN\n',
             'fi\n',
-            '\n',
             'if [[ -n $SCRATCH ]];then\n',
             '  cp ${SCRATCH}/$WEST_CURRENT_SEG_DATA_REF/seg_end.net $WEST_CURRENT_SEG_DATA_REF/.\n',
             '  rm -rf ${SCRATCH}/$WEST_CURRENT_SEG_DATA_REF\n',
@@ -392,19 +597,24 @@ class BNGL_TO_WE:
         self._write_initsh()
         self._write_systempy()
         self._write_westcfg()
-        self._write_runsegsh()
+        if self.propagator_type == "executable":
+            self._write_runsegsh()
 
     def write_static_files(self):
         '''
         these files are always (mostly) the same regardless of given options 
         '''
         # everything here assumes we are in the right folder
-        self._write_runsh()
         self._write_envsh()
-        self._write_auxfuncs()
         self._write_bstatestxt()
-        self._write_getpcoord()
-        self._write_postiter()
+        self._write_auxfuncs()
+        self._write_runsh()
+        if self.propagator_type == "executable":
+            self._write_getpcoord()
+            self._write_postiter()
+        elif self.propagator_type == "libRoadRunner":
+            self._write_restartDriver()
+            self._write_librrPropagator()
 
     def make_sim_folders(self):
         '''
@@ -415,7 +625,8 @@ class BNGL_TO_WE:
         os.chdir(self.fname)
         os.makedirs("bngl_conf")
         os.makedirs("bstates")
-        os.makedirs("westpa_scripts")
+        if self.propagator_type == "executable":
+            os.makedirs("westpa_scripts")
 
 
     def copy_run_network(self):
@@ -433,6 +644,32 @@ class BNGL_TO_WE:
         to get a) .net file for the starting point and b) .gdat file
         to get the first voronoi center for the simulation
         '''
+        if self.propagator_type == "executable":
+            self._executable_BNGL_on_file()
+        elif self.propagator_type == "libRoadRunner":
+            self._libRR_BNGL_on_file()
+
+    def _libRR_BNGL_on_file(self):
+        # We still need this stuff
+        self._executable_BNGL_on_file()
+        # But we also need to generate the XML file
+        # get in the conf folder
+        os.chdir("bngl_conf")
+        # make a copy that we will use to generat the XML
+        shutil.copyfile(self.bngl_file, "gen_xml.bngl")
+        with open("gen_xml.bngl", "a") as f:
+            f.write('generate_network({overwrite=>1});\n')
+            f.write('writeSBML({})\n')
+        proc = sbpc.Popen([self.bngpl, "gen_xml.bngl"])
+        proc.wait()
+        assert proc.returncode == 0, "call to BNG2.pl failed, make sure it's in your PATH"
+        shutil.copyfile("gen_xml_sbml.xml", "init.xml")
+        os.remove("gen_xml.bngl")
+        os.remove("gen_xml.net")
+        # return to main simulation folder
+        os.chdir(os.path.join(self.main_dir, self.sim_dir))
+
+    def _executable_BNGL_on_file(self):
         # IMPORTANT! 
         # This assumes that the bngl file doesn't have any directives at the end! 
         # we have a bngl file
@@ -441,16 +678,14 @@ class BNGL_TO_WE:
         # b) getting a starting  gdat file
         shutil.copyfile(self.bngl_file, "init.bngl")
         shutil.copyfile(self.bngl_file, "for_network.bngl")
-        f = open("for_network.bngl", "a")
-        # Adding directives to generate the files we want
-        f.write('generate_network({overwrite=>1});\n')
-        f.close()
+        with open("for_network.bngl", "a") as f:
+            # Adding directives to generate the files we want
+            f.write('generate_network({overwrite=>1});\n')
         shutil.copyfile(self.bngl_file, "for_gdat.bngl")
-        f = open("for_gdat.bngl", "a")
-        # Adding directives to generate the files we want
-        f.write('generate_network({overwrite=>1});\n')
-        f.write('simulate({method=>"ssa",t_end=>2,n_steps=>1});\n')
-        f.close()
+        with open("for_gdat.bngl", "a") as f:
+            # Adding directives to generate the files we want
+            f.write('generate_network({overwrite=>1});\n')
+            f.write('simulate({method=>"ssa",t_end=>2,n_steps=>1});\n')
         # run BNG2.pl on things to get the files we need
         proc = sbpc.Popen([self.bngpl, "for_network.bngl"])
         proc.wait()
