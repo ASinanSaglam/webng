@@ -664,6 +664,7 @@ class BNGL_TO_WE:
         proc.wait()
         assert proc.returncode == 0, "call to BNG2.pl failed, make sure it's in your PATH"
         shutil.copyfile("gen_xml_sbml.xml", "init.xml")
+        os.remove("gen_xml_sbml.xml")
         os.remove("gen_xml.bngl")
         os.remove("gen_xml.net")
         # return to main simulation folder
