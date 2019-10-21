@@ -1,0 +1,4 @@
+binning_options: {block_size: 1000, center_freq: 1, max_centers: 250, traj_per_bin: 500}
+path_options: {WESTPA_path: /home/monoid/apps/westpa, bng_path: /home/monoid/apps/BioNetGen-2.5.0, bngl_file: /home/monoid/PROJECTS/BNG_WESTPA_pipeline/example/switch.bngl, sim_name: /home/monoid/PROJECTS/BNG_WESTPA_pipeline/example/switch}
+sampling_options: {dimensions: 8, max_iter: 1500, pcoord_length: 2, tau: 10}
+propagator_options: {propagator_type: libRoadRunner, pcoords:['[S1]','[S2]','[S3]','[S4]','[S5]','[S6]','[S7]','[S8]']}
