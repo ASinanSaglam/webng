@@ -462,7 +462,7 @@ class BNGL_TO_WE:
             '      model_file: {} # Generate this\n'.format(os.path.join(self.main_dir, self.fname, "bngl_conf","init.xml")),
             '      init_time_step: 0\n',
             '      final_time_step: {}\n'.format(self.tau),
-            '      num_time_step: {}\n'.format(step_no),
+            '      num_time_step: {}\n'.format(step_no+1),
             '    data:\n',
             '      pcoords: {}\n'.format(('["'+'","'.join(self.pcoord_list)+'"]'))] # TODO: Write pcoords
         with open("west.cfg", "w") as f:
