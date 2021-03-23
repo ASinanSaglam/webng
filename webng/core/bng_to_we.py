@@ -1,10 +1,10 @@
-import argparse, yaml, os, shutil, sys
+import argparse, yaml, os, shutil, sys, stat
 import subprocess as sbpc
 
 # TODO: Expose more functionality to the options file
 # especially some of them can be optionally exposed
 class BNGL_TO_WE:
-    def __init__(self):
+    def __init__(self, opts):
         '''
         take arguments from the commmand line and then parse the
         options file given
@@ -13,7 +13,8 @@ class BNGL_TO_WE:
         self._parse_args()
         self.opts = self._load_yaml(self.args.opts)
         self._parse_opts(self.opts)
-        self.copy_run_net = self.args.copy_run_net
+        # TODO: make this optional somewhere else
+        self.copy_run_net = True
 
     def _getd(self, dic, key, default=None, required=True):
         val = dic.get(key, default)
@@ -55,34 +56,13 @@ class BNGL_TO_WE:
         self.center_freq = self._getd(binning_options, "center_freq", default=1)
         self.max_centers = self._getd(binning_options, "max_centers", default=300)
 
-    def _parse_args(self):
-        '''
-        parse arguments passed in the command line
-        '''
-        parser = argparse.ArgumentParser()
-
-        # Data input options
-        parser.add_argument('--options', '-opts',
-                            dest='opts',
-                            required=True,
-                            help='Options YAML file, required',
-                            type=str)
-
-        parser.add_argument('--copy-run-network',
-                            dest='copy_run_net',
-                            action='store_true',
-                            help='If set, copies over the run_network binary')
-
-        self.args = parser.parse_args()
-
     def _load_yaml(self, yfile):
         '''
         internal function that opens a file and loads it in using 
         yaml library
         '''
-        f = open(yfile, "r")
-        y = yaml.load(f)
-        f.close()
+        with open(yfile, "r") as f:
+            y = yaml.load(f)
         return y
     
     def _write_librrPropagator(self):
@@ -249,10 +229,9 @@ class BNGL_TO_WE:
           '$WEST_ROOT/bin/w_run --work-manager processes "$@"\n'\
           ]
 
-        f = open("run.sh", "w")
-        f.writelines(lines)
-        f.close()
-        os.chmod("run.sh", 0764)
+        with open("run.sh", "w") as f:
+            f.writelines(lines)
+        os.chmod("run.sh",0o764)
 
     def _write_envsh(self):
         '''
@@ -273,10 +252,9 @@ class BNGL_TO_WE:
         else:
             lines.append('export RunNet="{}/bin/run_network"\n'.format(self.bng_path))
 
-        f = open("env.sh", "w")
-        f.writelines(lines)
-        f.close()
-        os.chmod("env.sh", 0764)
+        with open("env.sh", "w") as f:
+            f.writelines(lines)
+        os.chmod("env.sh", 0o764)
 
     def _write_auxfuncs(self):
         '''
@@ -328,10 +306,9 @@ class BNGL_TO_WE:
             'fi\n'
             ]
 
-        f = open("westpa_scripts/get_pcoord.sh", "w")
-        f.writelines(lines)
-        f.close()
-        os.chmod("westpa_scripts/get_pcoord.sh", 0764)
+        with open("westpa_scripts/get_pcoord.sh", "w") as f:
+            f.writelines(lines)
+        os.chmod("westpa_scripts/get_pcoord.sh", 0o764)
 
     def _write_postiter(self):
         '''
@@ -352,10 +329,9 @@ class BNGL_TO_WE:
             'fi\n'
             ]
 
-        f = open("westpa_scripts/post_iter.sh", "w")
-        f.writelines(lines)
-        f.close()
-        os.chmod("westpa_scripts/post_iter.sh", 0764)
+        with open("westpa_scripts/post_iter.sh", "w") as f:
+            f.writelines(lines)
+        os.chmod("westpa_scripts/post_iter.sh", 0o764)
 
     def _write_initsh(self):
         '''
@@ -371,10 +347,9 @@ class BNGL_TO_WE:
             '$WEST_ROOT/bin/w_init $BSTATE_ARGS --segs-per-state {} --work-manager=threads "$@"'.format(self.traj_per_bin),
             ]
 
-        f = open("init.sh", "w")
-        f.writelines(lines)
-        f.close()
-        os.chmod("init.sh", 0764)
+        with open("init.sh", "w") as f:
+            f.writelines(lines)
+        os.chmod("init.sh", 0o764)
 
     def _write_systempy(self):
         '''
@@ -584,10 +559,9 @@ class BNGL_TO_WE:
             'fi\n'
             ]
 
-        f = open("westpa_scripts/runseg.sh", "w")
-        f.writelines(lines)
-        f.close()
-        os.chmod("westpa_scripts/runseg.sh", 0764)
+        with open("westpa_scripts/runseg.sh", "w") as f:
+            f.writelines(lines)
+        os.chmod("westpa_scripts/runseg.sh", 0o764)
 
     def write_dynamic_files(self):
         '''
@@ -636,7 +610,7 @@ class BNGL_TO_WE:
         '''
         # Assumes path is absolute path and not relative
         shutil.copyfile(os.path.join(self.bng_path, "bin/run_network"), "bngl_conf/run_network")
-        os.chmod("bngl_conf/run_network",0764)
+        os.chmod("bngl_conf/run_network",0o764)
 
     def run_BNGL_on_file(self):
         '''

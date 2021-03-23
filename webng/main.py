@@ -1,19 +1,83 @@
 
-from cement import App, TestApp, init_defaults
+import cement
 from cement.core.exc import CaughtSignal
 from .core.exc import weBNGError
 from .controllers.base import Base
+from .core.bng_to_we import BNGL_TO_WE
+from .core.weTemplater import weTemplater
 
 # configuration defaults
-CONFIG = init_defaults('webng')
+CONFIG = cement.init_defaults('webng')
 CONFIG['webng']['foo'] = 'bar'
 
+class weBNGBase(cement.Controller):
+    '''
+    weBNG CLI 
 
-class weBNG(App):
+    Subcommands
+    -------
+    run
+        runs a model given by -i in folder given by -o
+    template
+        generates and opens a notebook for a model given by -i, optional
+    '''
+
+    class Meta:
+        label = "webng"
+        description = "webng"
+        help = "webng"
+
+    # This overwrites the default behavior
+    @cement.ex(
+            help="Sets up a WESTPA simulation folder from an options YAML file. "
+                  + "Run \"webng template -h\" for more information.",
+            arguments=[
+                (["--opts"],{"help":"Options YAML file (required)." + 
+                                       "Run \"webng template -h\" for more information.",
+                                   "default": None,
+                                   "type": str,
+                                   "required": True})
+            ]
+    )
+    def setup(self):
+        '''
+        This sub command sets up a WESTPA folder from a given options YAML file. 
+
+        See \"webng template -h\" for more information on the options YAML file.
+        '''
+        args = self.app.pargs
+        BNGL_TO_WE(args).run()
+    
+    @cement.ex(
+            help="Writes a template options file for a WESTPA simulation using a BNGL model.",
+            arguments=[
+                (["-i", "--input"],{"help":"The bngl model to write the template for." +
+                                      "If not model name is given, a template for \"model.bngl\" will be written",
+                                   "default": "model.bngl",
+                                   "type": str,
+                                   "required": False}),
+                (["-o", "--output"],{"help":"The name for the options file (default: opts.yaml)",
+                                   "default": "opts.yaml",
+                                   "type": str,
+                                   "required": False})
+            ]
+    )
+    def template(self):
+        '''
+        This sub command is used to write a template options file 
+        '''
+        args = self.app.pargs
+        weTemplater(args).run()
+
+
+
+class weBNG(cement.App):
     """weBNG primary application."""
 
     class Meta:
         label = 'webng'
+        description = "A command line tool to setup WESTPA simulations from BNGL models."
+        help = "weBNG"
 
         # configuration defaults
         config_defaults = CONFIG
@@ -42,11 +106,10 @@ class weBNG(App):
 
         # register handlers
         handlers = [
-            Base
+            weBNGBase
         ]
 
-
-class weBNGTest(TestApp,weBNG):
+class weBNGTest(cement.TestApp,weBNG):
     """A sub-class of weBNG that is better suited for testing."""
 
     class Meta:
