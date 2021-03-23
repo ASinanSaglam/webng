@@ -1,3 +1,74 @@
+# A weighted ensemble simulation setup tool starting from a BNGL model
+
+## Installation
+
+```
+$ pip install -r requirements.txt
+
+$ pip install setup.py
+```
+
+## Development
+
+This project includes a number of helpers in the `Makefile` to streamline common development tasks.
+
+### Environment Setup
+
+The following demonstrates setting up and working with a development environment:
+
+```
+### create a virtualenv for development
+
+$ make virtualenv
+
+$ source env/bin/activate
+
+
+### run webng cli application
+
+$ webng --help
+
+
+### run pytest / coverage
+
+$ make test
+```
+
+
+### Releasing to PyPi
+
+Before releasing to PyPi, you must configure your login credentials:
+
+**~/.pypirc**:
+
+```
+[pypi]
+username = YOUR_USERNAME
+password = YOUR_PASSWORD
+```
+
+Then use the included helper function via the `Makefile`:
+
+```
+$ make dist
+
+$ make dist-upload
+```
+
+## Deployments
+
+### Docker
+
+Included is a basic `Dockerfile` for building and distributing `weBNG`,
+and can be built with the included `make` helper:
+
+```
+$ make docker
+
+$ docker run -it webng --help
+```
+
+
 # BioNetGen and WESTPA pipeline
 
 This pipeline requires [BioNetGen](https://www.csb.pitt.edu/Faculty/Faeder/?page_id=409) and [WESTPA](https://github.com/westpa/westpa) already installed on the machine you want to run the simulation on, I suggest using the [Anaconda python distribution](https://www.anaconda.com/download/) for WESTPA as well. For some of the analysis an additional requirement is [PyEMMA](http://emma-project.org/latest/). I suggest following the Jupyter notebook provided in the main folder of this repo to understand how to use the pipeline and take a look at [this notebook](https://github.com/ASinanSaglam/WESTPA_Workshop_2018_Saglam/blob/master/analysis/analysis.ipynb) as well (note that that is somewhat older, especially for building the transition matrix please follow this repo, I will soon update the notebook in this repo with those analyses and remove this warning).
