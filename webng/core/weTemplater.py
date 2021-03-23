@@ -7,6 +7,8 @@ class weTemplater:
         self.out_file = args.output
         # setup a template dictionary
         self.template_dict = {
+            "propagator_options": { "propagator_type": "libRoadRunner",
+                                    "pcoords": None},
             "binning_options":  {"block_size": 10, 
                                  "center_freq": 1, 
                                  "max_centers": 300, 
@@ -44,9 +46,17 @@ class weTemplater:
             bng_name = "bng-mac"
         # get library path
         lib_path = os.path.dirname(bionetgen.__file__)
-        lib_path = os.path.split(lib_path)[0]
         bng_path = os.path.join(lib_path, bng_name)
         return bng_path
+
+    def _get_pcoords(self):
+        # use bng api to get the model object
+        model = bionetgen.bngmodel(self.inp_file)
+        obs_arr = []
+        # get observable strings
+        for obs in model.observables:
+            obs_arr.append(str(obs))
+        return obs_arr
 
     def _adjust_template(self):
         # set westpa path
@@ -54,11 +64,13 @@ class weTemplater:
         # set bng path
         self.template_dict["path_options"]["bng_path"] = self._get_bng_path()
         # input model
-        self.template_dict["path_options"]["bngl_file"] = self.inp_file
+        self.template_dict["path_options"]["bngl_file"] = os.path.abspath(self.inp_file)
         # output folder
         model_file = os.path.split(self.inp_file)[1]
         model_name = os.path.splitext(model_file)[0]
-        self.template_dict["path_options"]["sim_name"] = model_name
+        self.template_dict["path_options"]["sim_name"] =os.path.join(os.getcwd(), model_name)
+        # set propagator options, in particular get observable names
+        self.template_dict["propagator_options"]["pcoords"] = self._get_pcoords()
 
     def run(self):
         ystr = yaml.dump(self.template_dict)

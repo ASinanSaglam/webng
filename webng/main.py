@@ -12,14 +12,17 @@ CONFIG['webng']['foo'] = 'bar'
 
 class weBNGBase(cement.Controller):
     '''
-    weBNG CLI 
+    webng is a simple command line tool to simplify WESTPA simulations of
+    BioNetGen models. It can generate a template options file and using the 
+    options file you can generate a WESTPA folder ready to run using the model
+    file given. 
 
     Subcommands
     -------
-    run
-        runs a model given by -i in folder given by -o
+    setup
+        creates a WESTPA folder ready to run form a given options YAML file
     template
-        generates and opens a notebook for a model given by -i, optional
+        generates a simple template YAML file to pass to setup subcommand
     '''
 
     class Meta:

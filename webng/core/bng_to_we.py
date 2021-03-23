@@ -4,14 +4,11 @@ import subprocess as sbpc
 # TODO: Expose more functionality to the options file
 # especially some of them can be optionally exposed
 class BNGL_TO_WE:
-    def __init__(self, opts):
+    def __init__(self, args):
         '''
-        take arguments from the commmand line and then parse the
-        options file given
+        take arguments from cement app and get ready to write
         '''
-        # read the options file
-        self._parse_args()
-        self.opts = self._load_yaml(self.args.opts)
+        self.opts = self._load_yaml(args.opts)
         self._parse_opts(self.opts)
         # TODO: make this optional somewhere else
         self.copy_run_net = True
@@ -19,7 +16,7 @@ class BNGL_TO_WE:
     def _getd(self, dic, key, default=None, required=True):
         val = dic.get(key, default)
         if required and (val is None):
-            sys.exit("{} is not specified in the dictionary")
+            sys.exit("{} is not specified in the dictionary".format(key))
         return val
 
     def _parse_opts(self, opts_dict):
