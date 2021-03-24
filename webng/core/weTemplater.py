@@ -17,7 +17,7 @@ class weTemplater:
                                  "bng_path": None,
                                  "bngl_file": None, 
                                  "sim_name": None},
-            "sampling_options": {"dimensions": 2, 
+            "sampling_options": {"dimensions": None, 
                                  "max_iter": 10, 
                                  "pcoord_length": 10, 
                                  "tau": 100}
@@ -68,9 +68,11 @@ class weTemplater:
         # output folder
         model_file = os.path.split(self.inp_file)[1]
         model_name = os.path.splitext(model_file)[0]
-        self.template_dict["path_options"]["sim_name"] =os.path.join(os.getcwd(), model_name)
+        self.template_dict["path_options"]["sim_name"] = os.path.join(os.getcwd(), model_name)
         # set propagator options, in particular get observable names
-        self.template_dict["propagator_options"]["pcoords"] = self._get_pcoords()
+        pcoords = self._get_pcoords()
+        self.template_dict["propagator_options"]["pcoords"] = pcoords
+        self.template_dict["sampling_options"]["dimensions"] = len(pcoords)
 
     def run(self):
         ystr = yaml.dump(self.template_dict)
