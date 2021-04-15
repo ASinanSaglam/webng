@@ -1,6 +1,8 @@
 import numpy as np
 import pickle, sys
-from westpa.core.binning import NopMapper, RectilinearBinMapper
+import matplotlib
+import matplotlib.pyplot as plt
+from westpa.core.binning import NopMapper
 
 index_dtype = np.uint16
 
@@ -69,6 +71,7 @@ def load_mapper(h, iter_no):
 
     topol_grp = h['bin_topologies']
     hashval = h['iterations/iter_{:08d}'.format(iter_no)].attrs['binhash']
+    hashval =  bytes(hashval, 'utf-8')
     index = topol_grp['index']
     pickles = topol_grp['pickles']
     n_entries = len(index)
@@ -102,22 +105,22 @@ def assign_pcca():
     WClusterer.load_pcca_labels('/home/monoid/PROJECTS/PLURI_12GENE/001/analysis/metasble_assignments.pkl')
     return WClusterer
 
-def assign_halton():
-    import matplotlib.pyplot as plt
-    import ghalton as gh
-    print("getting halton centers")
-    import h5py
-    h = h5py.File('west.h5','r')
-    i = h.attrs['west_current_iteration']
-    mapper = load_mapper(h, i)
-    seq = gh.Halton(mapper.centers.shape[1])
-    s = np.array(seq.get(mapper.centers.shape[0]))
-    for i in range(mapper.centers.shape[1]):
-        s[:,i] = s[:,i] * (mapper.centers[:,i].max())
-    np.save("halton_centers.npy", s)
-    # done plotting
-    mapper.centers = s
-    return mapper 
+# def assign_halton():
+#     import matplotlib.pyplot as plt
+#     import ghalton as gh
+#     print("getting halton centers")
+#     import h5py
+#     h = h5py.File('west.h5','r')
+#     i = h.attrs['west_current_iteration']
+#     mapper = load_mapper(h, i)
+#     seq = gh.Halton(mapper.centers.shape[1])
+#     s = np.array(seq.get(mapper.centers.shape[0]))
+#     for i in range(mapper.centers.shape[1]):
+#         s[:,i] = s[:,i] * (mapper.centers[:,i].max())
+#     np.save("halton_centers.npy", s)
+#     # done plotting
+#     mapper.centers = s
+#     return mapper
 
 class wrapped_mapper(NopMapper):
     def __init__(self, mapper):
@@ -171,3 +174,63 @@ def pull_weight(n_iter, iter_group):
     ## normalize 
     #data = data/sum(data)
     return iter_group['seg_index']['weight'][...]
+
+
+# Next two functions by: 
+# Voronoi diagram from a list of points
+# Copyright (C) 2011  Nicolas P. Rougier
+
+def circumcircle(P1,P2,P3):
+    ''' 
+    Adapted from:
+    http://local.wasp.uwa.edu.au/~pbourke/geometry/circlefrom3/Circle.cpp
+    '''
+    delta_a = P2 - P1
+    delta_b = P3 - P2
+    if np.abs(delta_a[0]) <= 0.000000001 and np.abs(delta_b[1]) <= 0.000000001:
+        center_x = 0.5*(P2[0] + P3[0])
+        center_y = 0.5*(P1[1] + P2[1])
+    else:
+        aSlope = delta_a[1]/delta_a[0]
+        bSlope = delta_b[1]/delta_b[0]
+
+        if aSlope == 0.0:
+            aSlope = 1E-6
+
+        if bSlope == 0.0:
+            bSlope = 1E-6
+
+        if np.isinf(aSlope):
+            aSlope = 1E6
+
+        if np.isinf(bSlope):
+            bSlope = 1E6
+
+        if np.abs(aSlope-bSlope) <= 0.000000001:
+            return None
+        center_x= (aSlope*bSlope*(P1[1] - P3[1]) + bSlope*(P1[0] + P2 [0]) \
+                        - aSlope*(P2[0]+P3[0]) )/(2* (bSlope-aSlope) )
+        center_y = -1*(center_x - (P1[0]+P2[0])/2)/aSlope +  (P1[1]+P2[1])/2;
+    return center_x, center_y
+
+def voronoi(X,Y):
+    P = np.zeros((X.size+4,2))
+    P[:X.size,0], P[:Y.size,1] = X, Y
+    # We add four points at "infinity"
+    m = max(np.abs(X).max(), np.abs(Y).max())*1e5
+    P[X.size:,0] = [-m, -m, +m, +m]
+    P[Y.size:,1] = [-m, +m, -m, +m]
+    D = matplotlib.tri.Triangulation(P[:,0],P[:,1])
+    T = D.triangles
+    n = T.shape[0]
+    C = np.zeros((n,2))
+    for i in range(n):
+        C[i] = circumcircle(P[T[i,0]],P[T[i,1]],P[T[i,2]])
+    X,Y = C[:,0], C[:,1]
+    segments = []
+    for i in range(n):
+        for j in range(3):
+            k = D.neighbors[i][j]
+            if k != -1:
+                segments.append( [(X[i],Y[i]), (X[k],Y[k])] )
+    return segments

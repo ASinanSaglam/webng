@@ -5,6 +5,7 @@ from .core.exc import weBNGError
 from .controllers.base import Base
 from .core.bng_to_we import BNGL_TO_WE
 from .core.weTemplater import weTemplater
+from .core.weAnalysis import weAnalysis
 
 # configuration defaults
 CONFIG = cement.init_defaults('webng')
@@ -71,6 +72,23 @@ class weBNGBase(cement.Controller):
         '''
         args = self.app.pargs
         weTemplater(args).run()
+
+    @cement.ex(
+            help="Some BNGL specific analyses for a BNG/WESTPA simulation.",
+            arguments=[
+                (["--opts"],{"help":"Options YAML file used to generate the WESTPA folder including" +
+                                    "the analyses requested and relevant options. For more information see X",
+                                   "default": "opts.yaml",
+                                   "type": str,
+                                   "required": False})
+            ]
+    )
+    def analysis(self):
+        '''
+        The analysis subcommand 
+        '''
+        args = self.app.pargs
+        weAnalysis(args.opts).run()
 
 
 

@@ -20,7 +20,35 @@ class weTemplater:
             "sampling_options": {"dimensions": None, 
                                  "max_iter": 10, 
                                  "pcoord_length": 10, 
-                                 "tau": 100}
+                                 "tau": 100},
+            "analyses": {
+                "enabled": False,
+                "average": {
+                    "enabled": False,
+                    "mapper-iter": None,
+                    "plot-voronoi": False,
+                    "plot-energy": False,
+                    "normalize": False,
+                    "first-iter": None,
+                    "last-iter": None,
+                    "dimensions": None,
+                    "work-path": None,
+                    "output": "average.png",
+                    "smoothing": 0.5,
+                    "plot-opts": {
+                        "name-font-size": 12
+                    }
+                },
+                "evolution": {
+                    "enabled": False
+                },
+                "cluster": {
+                    "enabled": False
+                },
+                "network": {
+                    "enabled": False
+                }
+            }
         }
         # adjust dictionary
         self._adjust_template()
@@ -73,6 +101,10 @@ class weTemplater:
         pcoords = self._get_pcoords()
         self.template_dict["propagator_options"]["pcoords"] = pcoords
         self.template_dict["sampling_options"]["dimensions"] = len(pcoords)
+        # TODO: update analysis options as well
+        for an_key in self.template_dict["analyses"].keys():
+            self.template_dict["analyses"][an_key]["work-path"] = \
+                os.path.join(self.template_dict["path_options"]["sim_name"], "analysis")
 
     def run(self):
         ystr = yaml.dump(self.template_dict)
