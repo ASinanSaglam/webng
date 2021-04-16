@@ -3,14 +3,16 @@ import numpy as np
 import networkx as nx
 import pyemma as pe 
 from scipy.sparse import coo_matrix
+from webng.analysis.analysis import weAnalysis
 
 # Hacky way to ignore warnings, in particular pyemma insists on Python3
 import warnings
 warnings.filterwarnings("ignore")
 np.set_printoptions(precision=2)
 
-class WEClusterer:
-    def __init__(self):
+class weCluster(weAnalysis):
+    def __init__(self, opts):
+        super().__init__()
         # Get arguments as usual
         self._parse_args()
         # Parse and set the arguments
@@ -29,8 +31,6 @@ class WEClusterer:
         self.symmetrize = self.args.symmetrize
         # name file 
         self.name_path = self.args.name_path
-        # halton centers
-        self.halton_centers = self.args.halton_centers
         # normalize data so results are in %s 
         self.normalize = self.args.normalize
 
@@ -284,13 +284,13 @@ class WEClusterer:
             print("{} bins are assigned to this state".format(len(np.where(a.T==i)[0])))
             for name in self.names:
                 # python 2.7 specific unfortunately
-                print '{0:^{width}}'.format(name, width=width, align="center"),
+                print('{0:^{width}}'.format(name, width=width, align="center"),)
             # similarly 2.7 specific
-            print
+            print()
             avg_vals = self.bin_labels[a.T==i].mean(axis=0)
             for val in avg_vals:
                 # python 2.7 specific unfortunately
-                print '{0:{width}.2f}'.format(val, width=width),
+                print('{0:{width}.2f}'.format(val, width=width),)
             # similarly 2.7 specific
             print
 
@@ -306,8 +306,3 @@ class WEClusterer:
         self.cluster()
         self.save_pcca()
         self.get_mstable_assignments()
-
-
-if __name__ == '__main__':
-    c = WEClusterer()
-    c.run()

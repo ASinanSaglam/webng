@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import itertools as itt
 import webng.analysis.utils as utils
+from webng.analysis.analysis import weAnalysis
 
 # Hacky way to disable warnings so we can focus on important stuff
 import warnings 
@@ -14,23 +15,11 @@ warnings.filterwarnings("ignore")
 # TODO: Separate out the pdisting, use native code
 # TODO: Hook into native code to decouple some parts like # of dimensions etc.
 # we need the system.py anyway, let's use native code to read CFG file
-class weAverage:
+class weAverage(weAnalysis):
     def __init__(self, opts):
+        super().__init__()
         # keep a copy of opts
         self.opts = opts
-        # we need to write assignment.py sometimes
-        self.pull_data_str =  "import numpy as np\n"
-        self.pull_data_str += "def pull_data(n_iter, iter_group):\n"
-        self.pull_data_str += "    '''\n"
-        self.pull_data_str += "    This function reshapes the progress coordinate and\n"
-        self.pull_data_str += "    auxiliary data for each iteration and retuns it to\n"
-        self.pull_data_str += "    the tool.\n"
-        self.pull_data_str += "    '''\n"
-        self.pull_data_str += "    data_to_pull = np.loadtxt(\"data_to_pull.txt\") - 1\n"
-        self.pull_data_str += "    d1, d2 = data_to_pull\n"
-        self.pull_data_str += "    pcoord  = iter_group['pcoord'][:,:,[int(d1),int(d2)]]\n"
-        self.pull_data_str += "    data = pcoord\n"    
-        self.pull_data_str += "    return data\n"
         # get this in so we can import it
         sys.path.append(opts["sim_name"])
         # Once the arguments are parsed, do a few prep steps, opening h5file
@@ -60,12 +49,6 @@ class weAverage:
         self.data_smoothing_level = opts["smoothing"]
         # data normalization to min/max
         self.normalize = opts["normalize"]
-
-    def _getd(self, dic, key, default=None, required=True):
-        val = dic.get(key, default)
-        if required and (val is None):
-            sys.exit("{} is not specified in the dictionary".format(key))
-        return val
 
     def get_mapper(self, mapper_iter):
         # Gotta fix this behavior
