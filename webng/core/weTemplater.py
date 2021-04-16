@@ -36,7 +36,9 @@ class weTemplater:
                     "output": "average.png",
                     "smoothing": 0.5,
                     "plot-opts": {
-                        "name-font-size": 12
+                        "name-font-size": 12,
+                        "voronoi-lw": 1,
+                        "voronoi-col": 0.75
                     }
                 },
                 "evolution": {

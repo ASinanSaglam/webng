@@ -234,6 +234,10 @@ class weAverage:
         if "plot-opts" in self.opts:
             plot_opts = self.opts['plot-opts']
             name_fsize = self._getd(plot_opts, "name-font-size", default=6)
+            vor_lw = self._getd(plot_opts, "voronoi-lw", default=0.15)
+            vor_col = self._getd(plot_opts, "voronoi-col", default=0.75)
+            vor_col = str(vor_col)
+
 
         f, axarr = self.setup_figure()
         #f.suptitle("Averaged between %i - %i"%(iiter+1, fiter+1))
@@ -385,7 +389,7 @@ class weAverage:
 
                         # Now get line segments
                         segments = utils.voronoi(Y,X)
-                        lines = mpl.collections.LineCollection(segments, color='0.75', lw=0.15)
+                        lines = mpl.collections.LineCollection(segments, color=vor_col, lw=vor_lw)
                         
                         # Plot line segments
                         axarr[ii,jj].add_collection(lines)
