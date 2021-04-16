@@ -1,5 +1,5 @@
 import sys,yaml
-from webng.analysis import weAverage
+from webng.analysis import weAverage, weEvolution
 
 class weAnalysis:
     def __init__(self, opts) -> None:
@@ -14,7 +14,6 @@ class weAnalysis:
         return val
 
     def run(self):
-        
         if "analyses" in self.opts:
             print("running analyses")
             # we got some analyses to run
@@ -27,10 +26,18 @@ class weAnalysis:
                     elif analysis_type == "average":
                         avg_dict = analysis_dict["average"]
                         if self._getd(avg_dict, "enabled", default=True):
-                            print("running analysis: average")
+                            print("running analysis: {}".format(analysis_type))
                             # avg enabled, run
                             avg_dict["pcoords"] = self.opts["propagator_options"]["pcoords"]
                             avg_dict["sim_name"] = self.opts["path_options"]["sim_name"]
                             weAverage(avg_dict).run()
+                    elif analysis_type == "evolution":
+                        evo_dict = analysis_dict["evolution"]
+                        if self._getd(evo_dict, "enabled", default=True):
+                            print("running analysis: {}".format(analysis_type))
+                            # avg enabled, run
+                            evo_dict["pcoords"] = self.opts["propagator_options"]["pcoords"]
+                            evo_dict["sim_name"] = self.opts["path_options"]["sim_name"]
+                            weEvolution(evo_dict).run()
                     else: 
                         continue

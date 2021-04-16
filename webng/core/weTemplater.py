@@ -42,13 +42,26 @@ class weTemplater:
                     }
                 },
                 "evolution": {
-                    "enabled": False
+                    "enabled": False,
+                    "plot-energy": False,
+                    "normalize": False,
+                    "dimensions": None,
+                    "work-path": None,
+                    "output": "average.png",
+                    "avg_window": None,
+                    "plot-opts": {
+                        "name-font-size": 12,
+                        "voronoi-lw": 1,
+                        "voronoi-col": 0.75
+                    }
                 },
                 "cluster": {
-                    "enabled": False
+                    "enabled": False,
+                    "work-path": None,
                 },
                 "network": {
-                    "enabled": False
+                    "enabled": False,
+                    "work-path": None,
                 }
             }
         }
@@ -103,10 +116,11 @@ class weTemplater:
         pcoords = self._get_pcoords()
         self.template_dict["propagator_options"]["pcoords"] = pcoords
         self.template_dict["sampling_options"]["dimensions"] = len(pcoords)
-        # TODO: update analysis options as well
+        # update analysis options as well
         for an_key in self.template_dict["analyses"].keys():
-            self.template_dict["analyses"][an_key]["work-path"] = \
-                os.path.join(self.template_dict["path_options"]["sim_name"], "analysis")
+            if an_key == "enabled":
+                continue
+            self.template_dict["analyses"][an_key]["work-path"] = os.path.join(self.template_dict["path_options"]["sim_name"], "analysis")
 
     def run(self):
         ystr = yaml.dump(self.template_dict)

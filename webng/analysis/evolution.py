@@ -5,9 +5,7 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
 import itertools as itt
-import assignment as asgn
-import voronoi_plot as vp
-#from 
+import webng.analysis.utils as utils
 
 # Hacky way to disable warnings so we can focus on important stuff
 import warnings 
@@ -16,73 +14,47 @@ warnings.filterwarnings("ignore")
 # TODO: Separate out the pdisting, use native code
 # TODO: Hook into native code to decouple some parts like # of dimensions etc.
 # we need the system.py anyway, let's use native code to read CFG file
-class evoPlotter:
-    def __init__(self):
-        # Let's parse cmdline arguments
-        self._parse_args()
+class weEvolution:
+    def __init__(self, opts):
+        # keep it around
+        self.opts = opts
         # Once the arguments are parsed, do a few prep steps, opening h5file
-        self.h5file_path = self.args.h5file_path
-        self.h5file = h5py.File(self.args.h5file_path, 'r')
+        self.h5file_path = os.path.join(opts["sim_name"], "west.h5")
+        self.h5file = h5py.File(self.h5file_path, 'r')
         # Set the dimensionality 
-        self.set_dims(self.args.dims)
+        self.set_dims(self._getd(opts, "dimensions", required=False))
         # Set names if we have them
-        self.set_names(self.args.names)
+        self.set_names(self._getd(opts, "pcoords", required=False))
         # Set work path
-        self.work_path = self.args.work_path
+        self.work_path = self._getd(opts, "work-path", default=os.getcwd(), required=False)
+        os.chdir(self.work_path)
         # Plotting energies or not?
-        self.do_energy = self.args.do_energy
+        self.do_energy = self._getd(opts, "plot-energy", required=False)
         # output name
-        self.outname = self.args.outname
+        self.outname = self._getd(opts, "output",default= "evolution.png", required=False)
         # averaging window
-        self.avg_window = self.args.avg_window
+        self.avg_window = self._getd(opts, "avg_window", default=10, required=False)
         # set last iter
         self.last_iter = self.h5file.attrs['west_current_iteration'] - 1
+        # we need to write assignment.py sometimes
+        self.pull_data_str =  "import numpy as np\n"
+        self.pull_data_str += "def pull_data(n_iter, iter_group):\n"
+        self.pull_data_str += "    '''\n"
+        self.pull_data_str += "    This function reshapes the progress coordinate and\n"
+        self.pull_data_str += "    auxiliary data for each iteration and retuns it to\n"
+        self.pull_data_str += "    the tool.\n"
+        self.pull_data_str += "    '''\n"
+        self.pull_data_str += "    data_to_pull = np.loadtxt(\"data_to_pull.txt\") - 1\n"
+        self.pull_data_str += "    d1, d2 = data_to_pull\n"
+        self.pull_data_str += "    pcoord  = iter_group['pcoord'][:,:,[int(d1),int(d2)]]\n"
+        self.pull_data_str += "    data = pcoord\n"    
+        self.pull_data_str += "    return data\n"
 
-    def _parse_args(self):
-        parser = argparse.ArgumentParser()
-
-        # TODO: Add defaults to help output
-        # Data input options
-        parser.add_argument('-W', '--westh5',
-                            dest='h5file_path',
-                            default="west.h5",
-                            help='Path to the WESTPA h5 file', 
-                            type=str)
-
-        parser.add_argument('--work-path',
-                            dest='work_path', default=os.getcwd(),
-                            help='Path to do our work in, save figs, the pdist files etc.',
-                            type=str)
-
-        parser.add_argument('--name-file',
-                            dest='names',
-                            default=None,
-                            help='Text file containing the names of each dimension separated by spaces',
-                            type=str)
-
-        parser.add_argument('--do-energy',
-                            dest='do_energy', action='store_true', default=False,
-                            help='Plot -lnP instead of probabilities')
-
-        parser.add_argument('-aw', '--avg-window', default=10,
-                          dest='avg_window',
-                          help='Averaging window size in iterations',
-                          type=int)
-
-        # TODO Support a list of dimensions instead
-        parser.add_argument('--dimensions', default=None,
-                          dest='dims',
-                          help='Number of dimensions to plot, at the moment a'
-                                'list of dimensions is not supported',
-                          type=int)
-
-        parser.add_argument('-o', '--outname', default=None,
-                          dest='outname',
-                          help='Name of the output file, extension determines the format',
-                          type=str)
-
-        self.args = parser.parse_args()
-
+    def _getd(self, dic, key, default=None, required=True):
+        val = dic.get(key, default)
+        if required and (val is None):
+            sys.exit("{} is not specified in the dictionary".format(key))
+        return val
 
     def set_dims(self, dims=None):
         if dims is None:
@@ -91,13 +63,8 @@ class evoPlotter:
         # return the dimensionality if we need to 
         return self.dims
 
-    def set_names(self, name_file):
-        print("Loading names from file {}".format(name_file))
-        if name_file is not None:
-            f = open(name_file, 'r')
-            n = f.readline()
-            f.close()
-            names = n.split()
+    def set_names(self, names):
+        if names is not None:
             self.names = dict( zip(range(len(names)), names) )
         else:
             # We know the dimensionality, can assume a 
@@ -109,7 +76,7 @@ class evoPlotter:
         # Setup the figure and names for each dimension
         #plt.figure(figsize=(20,20))
         plt.figure(figsize=(1.5,3.0))
-        rows = self.dims/2
+        rows = int(self.dims/2)
         f, axarr = plt.subplots(rows,2)
         f.subplots_adjust(hspace=1.2, wspace=0.2, bottom=0.1, left=0.06, top=0.98, right=0.98)
         if rows == 1:
@@ -138,6 +105,8 @@ class evoPlotter:
             pfile = os.path.join(self.work_path, "pdist_1_{}.h5".format(self.dims))
         # for now let's just get it working
         try:
+            if not os.path.isfile(pfile):
+                raise IOError
             open_file = h5py.File(pfile, 'r')
             return open_file
         except IOError:
@@ -145,9 +114,15 @@ class evoPlotter:
             # We are assuming we don't have the file now
             # TODO: Expose # of bins somewhere, this is REALLY hacky,
             # I need to fiddle with w_pdist to fix it up
-            f = open("data_to_pull.txt", "w")
-            f.write("{} {}".format(fdim, self.dims))
-            f.close()
+            
+            # we need to have assignment.py for w_pdist to work
+            # TODO: Try to make it use utils.pull data instead
+            with open("assignment.py", "w") as f:
+                f.write(self.pull_data_str)
+
+            with open("data_to_pull.txt", "w") as f:
+                f.write("{} {}".format(fdim, self.dims))
+
             proc = sbpc.Popen(["w_pdist", "-W", "{}".format(self.h5file_path), 
                        "-o", "{}".format(pfile), "-b", "30", 
                        "--construct-dataset", "assignment.pull_data"])
@@ -156,9 +131,13 @@ class evoPlotter:
             open_file = h5py.File(pfile, 'r')
             return open_file
             
-    def plot(self, ext=None):
+    def run(self, ext=None):
         f, axarr = self.setup_figure()
-        rows, cols = self.dims/2, 2
+        rows, cols = int(self.dims/2), int(2)
+
+        if "plot-opts" in self.opts:
+            plot_opts = self.opts['plot-opts']
+            name_fsize = self._getd(plot_opts, "name-font-size", default=6)
 
         # Loop over every dimension vs every other dimension
         for ii,jj in itt.product(range(rows),range(cols)):
@@ -172,10 +151,10 @@ class evoPlotter:
             axarr[ii,jj].tick_params(left=False, bottom=False)
         
             # Set the names 
-            axarr[ii,jj].set_ylabel(self.names[cdim], fontsize=6)
+            axarr[ii,jj].set_ylabel(self.names[cdim], fontsize=name_fsize)
             if ii == ((self.dims/2)-1):
                 # set y label
-                axarr[ii,jj].set_xlabel("WE Iterations", fontsize=6)
+                axarr[ii,jj].set_xlabel("WE Iterations", fontsize=name_fsize)
 
             # First pull a file that contains the dimension
             datFile = self.open_pdist_file(cdim+1)
@@ -216,11 +195,6 @@ class evoPlotter:
                                     range(0, self.last_iter-self.avg_window), 
                                     x_bins, 
                                     Hists.T, cmap=cmap, vmin=1e-60)
-        
+        plt.tight_layout()
         self.save_fig()
         return
-
-if __name__ == "__main__":
-    # Get the regular plot
-    ep = evoPlotter()
-    ep.plot()
