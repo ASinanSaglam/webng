@@ -17,11 +17,7 @@ warnings.filterwarnings("ignore")
 # we need the system.py anyway, let's use native code to read CFG file
 class weAverage(weAnalysis):
     def __init__(self, opts):
-        super().__init__()
-        # keep a copy of opts
-        self.opts = opts
-        # get this in so we can import it
-        sys.path.append(opts["sim_name"])
+        super().__init__(opts)
         # Once the arguments are parsed, do a few prep steps, opening h5file
         self.h5file_path = os.path.join(opts["sim_name"], "west.h5")
         self.h5file = h5py.File(self.h5file_path, 'r')
@@ -29,14 +25,6 @@ class weAverage(weAnalysis):
         self.get_mapper(opts["mapper-iter"])
         # Set the dimensionality 
         self.set_dims(opts["dimensions"])
-        # Set names if we have them
-        self.set_names(opts["pcoords"])
-        # Set work path
-        self.work_path = self._getd(opts, "work-path", default=os.getcwd(), required=False)
-        # we want to go there
-        assert os.path.isdir(self.work_path), "Work path: {} doesn't exist".format(self.work_path)
-        self.curr_path = os.getcwd()
-        os.chdir(self.work_path)
         # Voronoi or not
         self.voronoi = opts["plot-voronoi"]
         # Plotting energies or not?

@@ -16,22 +16,14 @@ warnings.filterwarnings("ignore")
 # we need the system.py anyway, let's use native code to read CFG file
 class weEvolution(weAnalysis):
     def __init__(self, opts):
-        super().__init__()
+        super().__init__(opts)
         # keep it around
         self.opts = opts
         # Once the arguments are parsed, do a few prep steps, opening h5file
         self.h5file_path = os.path.join(opts["sim_name"], "west.h5")
         self.h5file = h5py.File(self.h5file_path, 'r')
         # Set the dimensionality 
-        self.set_dims(self._getd(opts, "dimensions", required=False))
-        # Set names if we have them
-        self.set_names(self._getd(opts, "pcoords", required=False))
-        # Set work path
-        self.work_path = self._getd(opts, "work-path", default=os.getcwd(), required=False)
-        # we want to go there
-        assert os.path.isdir(self.work_path), "Work path: {} doesn't exist".format(self.work_path)
-        self.curr_path = os.getcwd()
-        os.chdir(self.work_path)    
+        self.set_dims(self._getd(opts, "dimensions", required=False))   
         # Plotting energies or not?
         self.do_energy = self._getd(opts, "plot-energy", required=False)
         # output name

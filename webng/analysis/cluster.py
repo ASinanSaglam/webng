@@ -11,16 +11,8 @@ np.set_printoptions(precision=2)
 
 class weCluster(weAnalysis):
     def __init__(self, opts):
-        super().__init__()
-        # keep the options around
-        self.opts = opts
+        super().__init__(opts)
         # Parse and set the arguments
-        # Set work path
-        self.work_path = self._getd(opts, "work-path", default=os.getcwd(), required=False)
-        # we want to go there
-        assert os.path.isdir(self.work_path), "Work path: {} doesn't exist".format(self.work_path)
-        self.curr_path = os.getcwd()
-        os.chdir(self.work_path)
         # iterations
         self.first_iter, self.last_iter = self._getd(opts, "first-iter", default=None, required=False), \
                                     self._getd(opts, "last-iter", default=None, required=False)
@@ -38,8 +30,6 @@ class weCluster(weAnalysis):
         self.symmetrize = self._getd(opts, "symmetrize", default=True, required=False)
         # normalize data so results are in %s 
         self.normalize = self._getd(opts, "normalize", default=False, required=False)
-        # name file 
-        self.set_names(self._getd(opts, "pcoords", default=None, required=False))
 
     def _load_assignments(self, file_path):
         if file_path is None:
@@ -145,15 +135,6 @@ class weCluster(weAnalysis):
     def save_pcca(self):
         with open("pcca.pkl", 'w') as f:
             pickle.dump(self.pcca, f)
-
-    def set_names(self, names):
-        if names is not None:
-            self.names = dict( zip(range(len(names)), names) )
-        else:
-            # We know the dimensionality, can assume a 
-            # naming scheme if we don't have one
-            print("Giving default names to each dimension")
-            self.names = dict( (i, str(i)) for i in range(self.dims) )
 
     # def _load_custom_centers(self, centers, nz_inds=None):
     #     '''
