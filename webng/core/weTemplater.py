@@ -57,7 +57,15 @@ class weTemplater:
                 },
                 "cluster": {
                     "enabled": False,
-                    "work-path": None,
+                    "work-path": None, 
+                    "first-iter": None, # default, beginning of sim
+                    "last-iter": None, # default, end of sim
+                    "transition-matrix": None, # default, make a new one
+                    "assignments": None, # default, make a new one
+                    "metastable-states-file": None, # default, metasble_assignments.pkl
+                    "cluster-count": None, # default, none, require the cluster count
+                    "normalize": None, # default false
+                    "symmetrize": None # default true
                 },
                 "network": {
                     "enabled": False,

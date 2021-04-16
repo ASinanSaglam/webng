@@ -32,7 +32,7 @@ class weAverage(weAnalysis):
         # Set names if we have them
         self.set_names(opts["pcoords"])
         # Set work path
-        self.work_path = opts["work-path"]
+        self.work_path = self._getd(opts, "work-path", default=os.getcwd(), required=False)
         # we want to go there
         assert os.path.isdir(self.work_path), "Work path: {} doesn't exist".format(self.work_path)
         self.curr_path = os.getcwd()
@@ -42,7 +42,7 @@ class weAverage(weAnalysis):
         # Plotting energies or not?
         self.do_energy = opts["plot-energy"]
         # iterations
-        self.iiter, self.fiter = self.set_iter_range(opts["first-iter"], opts["last-iter"])
+        self.first_iter, self.last_iter = self.set_iter_range(opts["first-iter"], opts["last-iter"])
         # output name
         self.outname = opts["output"]
         # data smoothing
@@ -79,13 +79,13 @@ class weAverage(weAnalysis):
             print("Giving default names to each dimension")
             self.names = dict( (i, str(i)) for i in range(self.dims) )
 
-    def set_iter_range(self, iiter, fiter):
-        if iiter is None:
-            iiter = 0
-        if fiter is None:
-            fiter = self.h5file.attrs['west_current_iteration'] - 1
+    def set_iter_range(self, first_iter, last_iter):
+        if first_iter is None:
+            first_iter = 0
+        if last_iter is None:
+            last_iter = self.h5file.attrs['west_current_iteration'] - 1
 
-        return iiter, fiter 
+        return first_iter, last_iter 
 
     def setup_figure(self):
         # Setup the figure and names for each dimension
@@ -100,7 +100,7 @@ class weAverage(weAnalysis):
         if self.outname is not None:
             outname = self.outname
         else:
-            outname = "all_{:05d}_{:05d}.png".format(self.iiter, self.fiter)
+            outname = "all_{:05d}_{:05d}.png".format(self.first_iter, self.last_iter)
 
         # save the figure
         print("Saving figure to {}".format(outname))
@@ -141,7 +141,7 @@ class weAverage(weAnalysis):
             return open_file
             
     def run(self, ext=None):
-        iiter, fiter = self.iiter, self.fiter
+        first_iter, last_iter = self.first_iter, self.last_iter
         if "plot-opts" in self.opts:
             plot_opts = self.opts['plot-opts']
             name_fsize = self._getd(plot_opts, "name-font-size", default=6)
@@ -151,7 +151,6 @@ class weAverage(weAnalysis):
 
 
         f, axarr = self.setup_figure()
-        #f.suptitle("Averaged between %i - %i"%(iiter+1, fiter+1))
         # Loop over every dimension vs every other dimension
         # TODO: We could just not plot the lower triangle and 
         # save time and simplify code
@@ -183,7 +182,7 @@ class weAverage(weAnalysis):
                     # First pull a file that contains the dimension
                     pfile = os.path.join(self.work_path, "pdist_{}_{}.h5".format(fi,self.dims))
                     datFile = self.open_pdist_file(fi, self.dims)
-                    Hists = datFile['histograms'][iiter:fiter]
+                    Hists = datFile['histograms'][first_iter:last_iter]
                     # Get average and average the other dimension
                     Hists = Hists.mean(axis=0)
                     Hists = Hists.mean(axis=1)
@@ -191,7 +190,7 @@ class weAverage(weAnalysis):
                     # We just need one that contains the last dimension
                     pfile = os.path.join(self.work_path, "pdist_{}_{}.h5".format(1,self.dims))
                     datFile = self.open_pdist_file(1, self.dims)
-                    Hists = datFile['histograms'][iiter:fiter]
+                    Hists = datFile['histograms'][first_iter:last_iter]
                     # Average the correct dimension here
                     Hists = Hists.mean(axis=0)
                     Hists = Hists.mean(axis=0)
@@ -229,7 +228,7 @@ class weAverage(weAnalysis):
                 # Get average histograms over iterations, 
                 # take -ln of the histogram after normalizing 
                 # and set minimum to 0 
-                Hists = datFile['histograms'][iiter:fiter]
+                Hists = datFile['histograms'][first_iter:last_iter]
                 Hists = Hists.mean(axis=0)
                 Hists = Hists/(Hists.sum())
                 #Hists = -np.log(Hists)

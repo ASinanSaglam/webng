@@ -1,6 +1,5 @@
-import pickle, h5py, sys, argparse
+import pickle, h5py, os
 import numpy as np
-import networkx as nx
 import pyemma as pe 
 from scipy.sparse import coo_matrix
 from webng.analysis.analysis import weAnalysis
@@ -13,108 +12,65 @@ np.set_printoptions(precision=2)
 class weCluster(weAnalysis):
     def __init__(self, opts):
         super().__init__()
-        # Get arguments as usual
-        self._parse_args()
+        # keep the options around
+        self.opts = opts
         # Parse and set the arguments
+        # Set work path
+        self.work_path = self._getd(opts, "work-path", default=os.getcwd(), required=False)
+        # we want to go there
+        assert os.path.isdir(self.work_path), "Work path: {} doesn't exist".format(self.work_path)
+        self.curr_path = os.getcwd()
+        os.chdir(self.work_path)
         # iterations
-        self.iiter, self.fiter = self.args.iiter, self.args.fiter
+        self.first_iter, self.last_iter = self._getd(opts, "first-iter", default=None, required=False), \
+                                    self._getd(opts, "last-iter", default=None, required=False)
         # Open files 
-        self.assignFile = h5py.File(self.args.assign_path, 'r')
-        self.tm = self._load_trans_mat(self.args.trans_mat_file)
-        # Set mstable file to save
-        self.mstab_file = self.args.mstab_file
+        self.assignFile = self._load_assignments(self._getd(opts, "assignments", default=None))
         # Set assignments
         self.assignments = self.assignFile['assignments']
+        # load transition matrix
+        self.tm = self._load_trans_mat(self._getd(opts, "transition-matrix", default=None, required=False))
+        # Set mstable file to save
+        self.mstab_file = self._getd(opts, "metastable-states-file", default="metasble_assignments.pkl", required=False)
         # Cluster count
-        self.cluster_count = self.args.cluster_count
+        self.cluster_count = self._getd(opts, "cluster-count")
         # Do we symmetrize
-        self.symmetrize = self.args.symmetrize
-        # name file 
-        self.name_path = self.args.name_path
+        self.symmetrize = self._getd(opts, "symmetrize", default=True, required=False)
         # normalize data so results are in %s 
-        self.normalize = self.args.normalize
+        self.normalize = self._getd(opts, "normalize", default=False, required=False)
+        # name file 
+        self.set_names(self._getd(opts, "pcoords", default=None, required=False))
 
-    def _parse_args(self):
-        parser = argparse.ArgumentParser()
-
-        # Data input options
-        parser.add_argument('-TM', '--trans_mat',
-                            dest='trans_mat_file',
-                            default="tmat.h5",
-                            help='Path to the w_reweight output h5 file'
-                            'that contains the transition matrix',
-                            type=str)
-
-        parser.add_argument('-A', '--assignh5',
-                            dest='assign_path',
-                            default="assign.h5",
-                            help='Path to the assignment h5 file', 
-                            type=str)
-
-        parser.add_argument('--mstab-file',
-                            dest='mstab_file',
-                            default="metasble_assignments.pkl",
-                            help='File to save metastable assignments into',
-                            type=str)
-
-        # Cluster count
-        parser.add_argument('--pcca-count', required=True,
-                          dest='cluster_count',
-                          help='Cluster count for the PCCA+ algorithm',
-                          type=int)
-
-        # Do we symmetrize the matrix?
-        parser.add_argument('--symmetrize-matrix',
-                            dest='symmetrize', action='store_true', default=False,
-                            help='Symmetrize matrix using (TM + TM.T)/2.0')
-
-        parser.add_argument('--normalize', '-n',
-                            dest='normalize', action='store_true', default=False,
-                            help='Normalizes the data such that min/max is 0/1')
-
-        parser.add_argument('--name-file',
-                            dest='name_path',
-                            default=None,
-                            help='Text file containing the names of each dimension separated by spaces',
-                            type=str)
-        
-        parser.add_argument('--halton-centers',
-                            dest='halton_centers',
-                            default=None,
-                            help='np.load\'able file for custom halton centers rather than the mapper centers',
-                            type=str)
-
-        parser.add_argument('--first-iter', default=None,
-                          dest='iiter',
-                          help='Average TM starting from this iteration'
-                               'By default, TM will be averaged starting from the first ' 
-                               'iteration in the specified h5 file. ',
-                          type=int)
-
-        parser.add_argument('--last-iter', default=None,
-                          dest='fiter',
-                          help='Average TM ending in this iteration '
-                               'LAST_ITER. By default, TM will be averaged up to'
-                               'and including the last iteration in the specified h5 file',
-                          type=int)
-
-        self.args = parser.parse_args()
+    def _load_assignments(self, file_path):
+        if file_path is None:
+            # TODO: Make assignment file automatically
+            # w_assign -W west.h5 --states-from-file states.yaml -o assign_voronoi.h5 || exit 1
+            # we need to make our own
+            pass
+        else: 
+            # we just need to open it
+            return h5py.File(file_path, 'r')
 
     def _load_trans_mat(self, tmat_file):
-        # Load h5 file
-        tmh5 = h5py.File(tmat_file, 'r')
+        if tmat_file is None:
+            # TODO: Make transition matrix automatically
+            # w_reweight init -W west.h5 -a assign_voronoi.h5 -o tmat.h5 || exit 1
+            pass
+        else: 
+            # Load h5 file
+            tmh5 = h5py.File(tmat_file, 'r')
         # We will need the number of rows and columns to convert from 
         # sparse matrix format
         nrows = tmh5.attrs['nrows']
         ncols = tmh5.attrs['ncols']
         # gotta average over iterations
         tm = None
-        if self.iiter is None:
-            self.iiter = tmh5.attrs['iter_start']
-        if self.fiter is None:
-            self.fiter = tmh5.attrs['iter_stop']
+        if self.first_iter is None:
+            self.first_iter = tmh5.attrs['iter_start']
+        if self.last_iter is None:
+            self.last_iter = tmh5.attrs['iter_stop']
 
-        for i in range(self.iiter, self.fiter):
+        for i in range(self.first_iter, self.last_iter):
             it_str = "iter_{:08d}".format(i)
             col = tmh5['iterations'][it_str]['cols']
             row = tmh5['iterations'][it_str]['rows']
@@ -187,41 +143,37 @@ class weCluster(weAnalysis):
         self.print_pcca_results()
 
     def save_pcca(self):
-        f = open("pcca.pkl", 'w')
-        pickle.dump(self.pcca, f)
-        f.close()
+        with open("pcca.pkl", 'w') as f:
+            pickle.dump(self.pcca, f)
 
-    def load_names(self):
-        '''
-        '''
-        # TODO: OBJify
-
-        if self.name_path is not None:
-            name_file = open(self.name_path, 'r')
-            self.names = name_file.readline().split()
-            name_file.close()
+    def set_names(self, names):
+        if names is not None:
+            self.names = dict( zip(range(len(names)), names) )
         else:
-            self.names = [str(i) for i in range(self.bin_labels.shape[1])]
+            # We know the dimensionality, can assume a 
+            # naming scheme if we don't have one
+            print("Giving default names to each dimension")
+            self.names = dict( (i, str(i)) for i in range(self.dims) )
 
-    def _load_custom_centers(self, centers, nz_inds=None):
-        '''
-        '''
-        print("loading custom centers")
-        if nz_inds is not None:
-            ccenters = np.load(centers)[self.nz_inds]
-        else:
-            ccenters = np.load(centers)
-        for i in range(ccenters.shape[1]):
-            ccenters_i = ccenters[:,i]
-            if self.normalize:
-                imin, imax = ccenters_i.min(), ccenters_i.max()
-                ccenters[:,i] = ccenters[:,i] - imin
-                if imax > 0:
-                    ccenters[:,i] = ccenters[:,i]/imax
-                ccenters *= 100
-        print("custom centers loaded")
-        #print(ccenters)
-        return ccenters
+    # def _load_custom_centers(self, centers, nz_inds=None):
+    #     '''
+    #     '''
+    #     print("loading custom centers")
+    #     if nz_inds is not None:
+    #         ccenters = np.load(centers)[self.nz_inds]
+    #     else:
+    #         ccenters = np.load(centers)
+    #     for i in range(ccenters.shape[1]):
+    #         ccenters_i = ccenters[:,i]
+    #         if self.normalize:
+    #             imin, imax = ccenters_i.min(), ccenters_i.max()
+    #             ccenters[:,i] = ccenters[:,i] - imin
+    #             if imax > 0:
+    #                 ccenters[:,i] = ccenters[:,i]/imax
+    #             ccenters *= 100
+    #     print("custom centers loaded")
+    #     #print(ccenters)
+    #     return ccenters
 
     def load_bin_arrays(self):
         '''
@@ -263,18 +215,14 @@ class weCluster(weAnalysis):
     def save_full_mstabs(self):
         '''
         '''
-        f = open(self.mstab_file, 'w')
-        pickle.dump(self.full_mstabs, f)
-        f.close()
+        with open(self.mstab_file, 'w') as f:
+            pickle.dump(self.full_mstabs, f)
 
     def print_mstable_states(self):
         '''
         '''
         print("##### Metastable states info #####")
-        if self.halton_centers is None:
-            self.load_bin_arrays()
-        else:
-            self.bin_labels = self._load_custom_centers(self.halton_centers, nz_inds=self.nz_inds)
+        self.load_bin_arrays()
         self.load_names()
         a = self.mstable_assignments
         # TODO: OBJify
@@ -283,16 +231,12 @@ class weCluster(weAnalysis):
             print("metastable state {} with probability {:.2f}%".format(i, self.p[i]*100))
             print("{} bins are assigned to this state".format(len(np.where(a.T==i)[0])))
             for name in self.names:
-                # python 2.7 specific unfortunately
-                print('{0:^{width}}'.format(name, width=width, align="center"),)
-            # similarly 2.7 specific
+                print('{0:^{width}}'.format(name, width=width, align="center"))
             print()
             avg_vals = self.bin_labels[a.T==i].mean(axis=0)
             for val in avg_vals:
-                # python 2.7 specific unfortunately
                 print('{0:{width}.2f}'.format(val, width=width),)
-            # similarly 2.7 specific
-            print
+            print()
 
     def get_mstable_assignments(self):
         '''

@@ -28,7 +28,10 @@ class weEvolution(weAnalysis):
         self.set_names(self._getd(opts, "pcoords", required=False))
         # Set work path
         self.work_path = self._getd(opts, "work-path", default=os.getcwd(), required=False)
-        os.chdir(self.work_path)
+        # we want to go there
+        assert os.path.isdir(self.work_path), "Work path: {} doesn't exist".format(self.work_path)
+        self.curr_path = os.getcwd()
+        os.chdir(self.work_path)    
         # Plotting energies or not?
         self.do_energy = self._getd(opts, "plot-energy", required=False)
         # output name
