@@ -1,18 +1,16 @@
-import pickle, h5py, sys, argparse
+import pickle
 import numpy as np
 import networkx as nx
-import pyemma as pe 
+from webng.analysis.analysis import weAnalysis
 
-#TODO: Turn into WESTPA tool
 # Hacky way to ignore warnings, in particular pyemma insists on Python3
 import warnings
 warnings.filterwarnings("ignore")
 np.set_printoptions(precision=2)
 
-class PCCANetworker:
-    def __init__(self):
-        # Get arguments as usual
-        self._parse_args()
+# python networker.py -PCCA pcca.pkl --mstab-file metasble_assignments.pkl --state-labels state_labels.txt
+class weNetwork(weAnalysis):
+    def __init__(self, opts):
         # Parse and set the arguments
         # Open files 
         self.pcca = self._load_pickle(self.args.pcca_pickle)
@@ -24,43 +22,41 @@ class PCCANetworker:
         self.state_labels = self._load_state_labels(self.args.state_labels)
         self._set_state_dicts()
 
-    def _parse_args(self):
-        parser = argparse.ArgumentParser()
+    # def _parse_args(self):
+    #     parser = argparse.ArgumentParser()
 
-        # Data input options
-        parser.add_argument('-PCCA', '--pcca-pickle',
-                            dest='pcca_pickle',
-                            default="pcca.pkl",
-                            help='Path to the pickled PCCA+ object',
-                            type=str)
+    #     # Data input options
+    #     parser.add_argument('-PCCA', '--pcca-pickle',
+    #                         dest='pcca_pickle',
+    #                         default="pcca.pkl",
+    #                         help='Path to the pickled PCCA+ object',
+    #                         type=str)
 
-        parser.add_argument('--mstab-file',
-                            dest='mstab_file',
-                            default='metasble_assignments.pkl',
-                            help='File to load metastable assignments from',
-                            type=str)
+    #     parser.add_argument('--mstab-file',
+    #                         dest='mstab_file',
+    #                         default='metasble_assignments.pkl',
+    #                         help='File to load metastable assignments from',
+    #                         type=str)
 
-        parser.add_argument('--state-labels',
-                            dest='state_labels',
-                            default=None,
-                            help='Text file containing the state labels for each coarse grained state',
-                            type=str)
+    #     parser.add_argument('--state-labels',
+    #                         dest='state_labels',
+    #                         default=None,
+    #                         help='Text file containing the state labels for each coarse grained state',
+    #                         type=str)
 
-        self.args = parser.parse_args()
+    #     self.args = parser.parse_args()
 
     def _load_pickle(self, filename):
-        f = open(filename, 'r')
-        l = pickle.load(f)
-        f.close()
+        with open(filename, 'r') as f:
+            l = pickle.load(f)
         return l
 
     def _load_state_labels(self, slfile):
         '''
         '''
         if slfile is not None:
-            slfile = open(slfile, 'r')
-            labels = slfile.readline().split()
-            slfile.close()
+            with open(slfile, 'r') as f:
+                labels = f.readline().split()
         else:
             labels = [str(i) for i in range(self.mstabs.max())]
 
@@ -132,8 +128,3 @@ class PCCANetworker:
         self.save_network()
         self.get_coarse_network()
         self.save_network()
-
-
-if __name__ == '__main__':
-    n = PCCANetworker()
-    n.run()
