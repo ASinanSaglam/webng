@@ -1,6 +1,8 @@
-import pickle, h5py, os
+import pickle, h5py, os, shutil
+from sys import stdout
 import numpy as np
-import pyemma as pe 
+import pyemma as pe
+import subprocess as sbpc
 from scipy.sparse import coo_matrix
 from webng.analysis.analysis import weAnalysis
 
@@ -13,11 +15,16 @@ class weCluster(weAnalysis):
     def __init__(self, opts):
         super().__init__(opts)
         # Parse and set the arguments
+        # get west.h5 path 
+        self.westh5_path = os.path.join(self.opts["sim_name"], "west.h5")
         # iterations
         self.first_iter, self.last_iter = self._getd(opts, "first-iter", default=None, required=False), \
                                     self._getd(opts, "last-iter", default=None, required=False)
+        # get states
+        state_dict = self._getd(opts, "states", default=None, required=True)
+        self.states = {"states": state_dict}
         # Open files 
-        self.assignFile = self._load_assignments(self._getd(opts, "assignments", default=None))
+        self.assignFile = self._load_assignments(self._getd(opts, "assignments", default=None, required=False))
         # Set assignments
         self.assignments = self.assignFile['assignments']
         # load transition matrix
@@ -33,22 +40,36 @@ class weCluster(weAnalysis):
 
     def _load_assignments(self, file_path):
         if file_path is None:
-            # TODO: Make assignment file automatically
-            # w_assign -W west.h5 --states-from-file states.yaml -o assign_voronoi.h5 || exit 1
             # we need to make our own
-            pass
+            import yaml
+            # we need system.py
+            shutil.copy(os.path.join(self.opts["sim_name"],"system.py"), "system.py")
+            # sort out states
+            self.state_file = "states.yaml"
+            # write state file
+            with open(self.state_file, "w") as f:
+                # yaml.dump(self.states, stdout)
+                yaml.dump(self.states, f)
+            # assign file setup
+            self.assign_file = "assign_voronoi.h5"
+            proc = sbpc.call(["w_assign", "-W", "{}".format(self.westh5_path), 
+                       "--states-from-file", "{}".format(self.state_file),
+                       "-o", "{}".format(self.assign_file)])
         else: 
             # we just need to open it
-            return h5py.File(file_path, 'r')
+            self.assign_file = file_path
+        return h5py.File(self.assign_file, 'r')
 
     def _load_trans_mat(self, tmat_file):
         if tmat_file is None:
-            # TODO: Make transition matrix automatically
-            # w_reweight init -W west.h5 -a assign_voronoi.h5 -o tmat.h5 || exit 1
-            pass
+            self.tmat_file = "tmat.h5"
+            proc = sbpc.call(["w_reweight", "init", "-W", "{}".format(self.westh5_path), 
+                    "-o", "{}".format(self.tmat_file), 
+                    "-a", "{}".format(self.assign_file)])
         else: 
             # Load h5 file
-            tmh5 = h5py.File(tmat_file, 'r')
+            self.tmat_file = tmat_file
+        tmh5 = h5py.File(self.tmat_file, 'r')
         # We will need the number of rows and columns to convert from 
         # sparse matrix format
         nrows = tmh5.attrs['nrows']
@@ -74,8 +95,8 @@ class weCluster(weAnalysis):
         # a markovian matrix here
         # TODO: support more than 2 states
         nstates = 2
-        mnrows = nrows/nstates
-        mncols = ncols/nstates
+        mnrows = int(nrows/nstates)
+        mncols = int(ncols/nstates)
         mtm = np.zeros((mnrows, mncols), dtype=flux.dtype)
         for i in range(mnrows):
             for j in range(mncols):
@@ -133,7 +154,7 @@ class weCluster(weAnalysis):
         self.print_pcca_results()
 
     def save_pcca(self):
-        with open("pcca.pkl", 'w') as f:
+        with open("pcca.pkl", 'wb') as f:
             pickle.dump(self.pcca, f)
 
     # def _load_custom_centers(self, centers, nz_inds=None):
@@ -164,7 +185,7 @@ class weCluster(weAnalysis):
         bin_labels_str = a['bin_labels'][...]
         bin_labels = []
         for ibstr, bstr in enumerate(bin_labels_str):
-            st, ed = bstr.find('['), bstr.find(']')
+            st, ed = bstr.find(b'['), bstr.find(b']')
             bin_labels.append(eval(bstr[st:ed+1]))
         bin_labels = np.array(bin_labels)[self.nz_inds]
         for i in range(bin_labels.shape[1]):
@@ -196,7 +217,9 @@ class weCluster(weAnalysis):
     def save_full_mstabs(self):
         '''
         '''
-        with open(self.mstab_file, 'w') as f:
+        if self.mstab_file is None:
+            self.mstab_file = "metasble_assignments.pkl"
+        with open(self.mstab_file, 'wb') as f:
             pickle.dump(self.full_mstabs, f)
 
     def print_mstable_states(self):
@@ -204,20 +227,16 @@ class weCluster(weAnalysis):
         '''
         print("##### Metastable states info #####")
         self.load_bin_arrays()
-        self.load_names()
         a = self.mstable_assignments
         # TODO: OBJify
+        print("NAMES: ", self.names)
         width = 6
         for i in range(a.max()+1):
             print("metastable state {} with probability {:.2f}%".format(i, self.p[i]*100))
-            print("{} bins are assigned to this state".format(len(np.where(a.T==i)[0])))
-            for name in self.names:
-                print('{0:^{width}}'.format(name, width=width, align="center"))
-            print()
+            print("{} bins are assigned to this state: ".format(len(np.where(a.T==i)[0])))
             avg_vals = self.bin_labels[a.T==i].mean(axis=0)
-            for val in avg_vals:
-                print('{0:{width}.2f}'.format(val, width=width),)
-            print()
+            for iname, name in enumerate(self.names):
+                print('  {}: {}'.format(self.names[name], avg_vals[iname]))
 
     def get_mstable_assignments(self):
         '''

@@ -1,5 +1,5 @@
 import sys,yaml
-from webng.analysis import weAverage, weEvolution
+from webng.analysis import weAverage, weEvolution, weCluster
 
 class weAnalysis:
     def __init__(self, opts) -> None:
@@ -39,5 +39,13 @@ class weAnalysis:
                             evo_dict["pcoords"] = self.opts["propagator_options"]["pcoords"]
                             evo_dict["sim_name"] = self.opts["path_options"]["sim_name"]
                             weEvolution(evo_dict).run()
+                    elif analysis_type == "cluster":
+                        clust_dict = analysis_dict["cluster"]
+                        if self._getd(clust_dict, "enabled", default=True):
+                            print("running analysis: {}".format(analysis_type))
+                            # avg enabled, run
+                            clust_dict["pcoords"] = self.opts["propagator_options"]["pcoords"]
+                            clust_dict["sim_name"] = self.opts["path_options"]["sim_name"]
+                            weCluster(clust_dict).run()
                     else: 
                         continue

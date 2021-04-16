@@ -100,7 +100,7 @@ class weEvolution(weAnalysis):
             with open("data_to_pull.txt", "w") as f:
                 f.write("{} {}".format(fdim, self.dims))
 
-            proc = sbpc.Popen(["w_pdist", "-W", "{}".format(self.h5file_path), 
+            proc = sbpc.call(["w_pdist", "-W", "{}".format(self.h5file_path), 
                        "-o", "{}".format(pfile), "-b", "30", 
                        "--construct-dataset", "assignment.pull_data"])
             proc.wait()

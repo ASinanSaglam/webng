@@ -65,7 +65,15 @@ class weTemplater:
                     "metastable-states-file": None, # default, metasble_assignments.pkl
                     "cluster-count": None, # default, none, require the cluster count
                     "normalize": None, # default false
-                    "symmetrize": None # default true
+                    "symmetrize": None, # default true
+                    "states": [{
+                        "label": "a",
+                        "coords": [[20.0,4.0]]
+                    },
+                    {
+                        "label": "b",
+                        "coords": [[4.0,20.0]]
+                    }]
                 },
                 "network": {
                     "enabled": False,
