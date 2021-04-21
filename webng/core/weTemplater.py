@@ -47,7 +47,7 @@ class weTemplater:
                     "normalize": False,
                     "dimensions": None,
                     "work-path": None,
-                    "output": "average.png",
+                    "output": "evolution.png",
                     "avg_window": None,
                     "plot-opts": {
                         "name-font-size": 12,

@@ -52,9 +52,10 @@ class weCluster(weAnalysis):
                 yaml.dump(self.states, f)
             # assign file setup
             self.assign_file = "assign_voronoi.h5"
-            proc = sbpc.call(["w_assign", "-W", "{}".format(self.westh5_path), 
+            proc = sbpc.Popen(["w_assign", "-W", "{}".format(self.westh5_path), 
                        "--states-from-file", "{}".format(self.state_file),
                        "-o", "{}".format(self.assign_file)])
+            proc.wait()
         else: 
             # we just need to open it
             self.assign_file = file_path
@@ -63,9 +64,10 @@ class weCluster(weAnalysis):
     def _load_trans_mat(self, tmat_file):
         if tmat_file is None:
             self.tmat_file = "tmat.h5"
-            proc = sbpc.call(["w_reweight", "init", "-W", "{}".format(self.westh5_path), 
+            proc = sbpc.Popen(["w_reweight", "init", "-W", "{}".format(self.westh5_path), 
                     "-o", "{}".format(self.tmat_file), 
                     "-a", "{}".format(self.assign_file)])
+            proc.wait()
         else: 
             # Load h5 file
             self.tmat_file = tmat_file
