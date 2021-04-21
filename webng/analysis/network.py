@@ -1,4 +1,4 @@
-import pickle
+import pickle, os, sys
 import numpy as np
 import networkx as nx
 from webng.analysis.analysis import weAnalysis
@@ -8,46 +8,35 @@ import warnings
 warnings.filterwarnings("ignore")
 np.set_printoptions(precision=2)
 
-# python networker.py -PCCA pcca.pkl --mstab-file metasble_assignments.pkl --state-labels state_labels.txt
 class weNetwork(weAnalysis):
     def __init__(self, opts):
+        # get our parent initialization setup
+        super().__init__(opts)
         # Parse and set the arguments
-        # Open files 
-        self.pcca = self._load_pickle(self.args.pcca_pickle)
+        # Load PCCA
+        default_pcca = os.path.join(opts["work-path"], "pcca.pkl")
+        self.pcca_path = self._getd(opts, "pcca-pickle", default=default_pcca, required=False)
+        if self.pcca_path is None:
+            self.pcca_path = default_pcca
+        try:
+            self.pcca = self._load_pickle(self.pcca_path)
+        except:
+            print("can't open file {}, quitting".format(self.pcca_path))
+            sys.exit()
+        # Get transition matrix 
         self.full_tm = self.pcca.transition_matrix
         self.coarse_tm = self.pcca.transition_matrix
         # Set mstable file to load 
-        self.mstabs = self._load_pickle(self.args.mstab_file)
+        default_mstab = os.path.join(opts["work-path"], "metasble_assignments.pkl")
+        self.mstab_file = self._getd(opts, "metastable-states", default=default_mstab, required=False)
+        self.mstabs = self._load_pickle(self.mstab_file)
         # name file 
-        self.state_labels = self._load_state_labels(self.args.state_labels)
+        self.state_label_path = self._getd(opts, "state-labels", default=None, required=False)
+        self.state_labels = self._load_state_labels(self.state_label_path)
         self._set_state_dicts()
 
-    # def _parse_args(self):
-    #     parser = argparse.ArgumentParser()
-
-    #     # Data input options
-    #     parser.add_argument('-PCCA', '--pcca-pickle',
-    #                         dest='pcca_pickle',
-    #                         default="pcca.pkl",
-    #                         help='Path to the pickled PCCA+ object',
-    #                         type=str)
-
-    #     parser.add_argument('--mstab-file',
-    #                         dest='mstab_file',
-    #                         default='metasble_assignments.pkl',
-    #                         help='File to load metastable assignments from',
-    #                         type=str)
-
-    #     parser.add_argument('--state-labels',
-    #                         dest='state_labels',
-    #                         default=None,
-    #                         help='Text file containing the state labels for each coarse grained state',
-    #                         type=str)
-
-    #     self.args = parser.parse_args()
-
     def _load_pickle(self, filename):
-        with open(filename, 'r') as f:
+        with open(filename, 'rb') as f:
             l = pickle.load(f)
         return l
 

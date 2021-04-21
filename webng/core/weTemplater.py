@@ -78,6 +78,9 @@ class weTemplater:
                 "network": {
                     "enabled": False,
                     "work-path": None,
+                    "pcca-pickle": None,
+                    "metastable-states-file": None,
+                    "state-labels": None
                 }
             }
         }
