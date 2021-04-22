@@ -55,33 +55,33 @@ class weTemplater:
                         "voronoi-col": 0.75
                     }
                 },
-                "cluster": {
-                    "enabled": False,
-                    "work-path": None, 
-                    "first-iter": None, # default, beginning of sim
-                    "last-iter": None, # default, end of sim
-                    "transition-matrix": None, # default, make a new one
-                    "assignments": None, # default, make a new one
-                    "metastable-states-file": None, # default, metasble_assignments.pkl
-                    "cluster-count": None, # default, none, require the cluster count
-                    "normalize": None, # default false
-                    "symmetrize": None, # default true
-                    "states": [{
-                        "label": "a",
-                        "coords": [[20.0,4.0]]
-                    },
-                    {
-                        "label": "b",
-                        "coords": [[4.0,20.0]]
-                    }]
-                },
-                "network": {
-                    "enabled": False,
-                    "work-path": None,
-                    "pcca-pickle": None,
-                    "metastable-states-file": None,
-                    "state-labels": None
-                }
+                # "cluster": {
+                #     "enabled": False,
+                #     "work-path": None, 
+                #     "first-iter": None, # default, beginning of sim
+                #     "last-iter": None, # default, end of sim
+                #     "transition-matrix": None, # default, make a new one
+                #     "assignments": None, # default, make a new one
+                #     "metastable-states-file": None, # default, metasble_assignments.pkl
+                #     "cluster-count": None, # default, none, require the cluster count
+                #     "normalize": None, # default false
+                #     "symmetrize": None, # default true
+                #     "states": [{
+                #         "label": "a",
+                #         "coords": [[20.0,4.0]]
+                #     },
+                #     {
+                #         "label": "b",
+                #         "coords": [[4.0,20.0]]
+                #     }]
+                # },
+                # "network": {
+                #     "enabled": False,
+                #     "work-path": None,
+                #     "pcca-pickle": None,
+                #     "metastable-states-file": None,
+                #     "state-labels": None
+                # }
             }
         }
         # adjust dictionary

@@ -37,22 +37,22 @@ class weAnalysis:
                         evo_dict["pcoords"] = self.opts["propagator_options"]["pcoords"]
                         evo_dict["sim_name"] = self.opts["path_options"]["sim_name"]
                         weEvolution(evo_dict).run()
-                if "cluster" in analysis_list:
-                    clust_dict = analysis_dict["cluster"]
-                    if self._getd(clust_dict, "enabled", default=True):
-                        print("running analysis: cluster")
-                        # enabled, run
-                        clust_dict["pcoords"] = self.opts["propagator_options"]["pcoords"]
-                        clust_dict["sim_name"] = self.opts["path_options"]["sim_name"]
-                        weCluster(clust_dict).run()
-                if "network" in analysis_list:
-                    net_dict = analysis_dict["network"]
-                    if self._getd(net_dict, "enabled", default=True):
-                        print("running analysis: network")
-                        # enabled, run
-                        if "cluster" in analysis_dict:
-                            net_dict["assignments"] = analysis_dict["cluster"]["assignments"]
-                            net_dict["metastable-states-file"] = analysis_dict["cluster"]["metastable-states-file"]
-                        net_dict["pcoords"] = self.opts["propagator_options"]["pcoords"]
-                        net_dict["sim_name"] = self.opts["path_options"]["sim_name"]
-                        weNetwork(net_dict).run()
+                # if "cluster" in analysis_list:
+                #     clust_dict = analysis_dict["cluster"]
+                #     if self._getd(clust_dict, "enabled", default=True):
+                #         print("running analysis: cluster")
+                #         # enabled, run
+                #         clust_dict["pcoords"] = self.opts["propagator_options"]["pcoords"]
+                #         clust_dict["sim_name"] = self.opts["path_options"]["sim_name"]
+                #         weCluster(clust_dict).run()
+                # if "network" in analysis_list:
+                #     net_dict = analysis_dict["network"]
+                #     if self._getd(net_dict, "enabled", default=True):
+                #         print("running analysis: network")
+                #         # enabled, run
+                #         if "cluster" in analysis_dict:
+                #             net_dict["assignments"] = analysis_dict["cluster"]["assignments"]
+                #             net_dict["metastable-states-file"] = analysis_dict["cluster"]["metastable-states-file"]
+                #         net_dict["pcoords"] = self.opts["propagator_options"]["pcoords"]
+                #         net_dict["sim_name"] = self.opts["path_options"]["sim_name"]
+                #         weNetwork(net_dict).run()
