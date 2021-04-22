@@ -1,24 +1,23 @@
-import argparse, yaml, os, shutil, sys
+import yaml, os, shutil, sys, bionetgen
+import numpy as np
 import subprocess as sbpc
 
 # TODO: Expose more functionality to the options file
 # especially some of them can be optionally exposed
 class BNGL_TO_WE:
-    def __init__(self):
+    def __init__(self, args):
         '''
-        take arguments from the commmand line and then parse the
-        options file given
+        take arguments from cement app and get ready to write
         '''
-        # read the options file
-        self._parse_args()
-        self.opts = self._load_yaml(self.args.opts)
+        self.opts = self._load_yaml(args.opts)
         self._parse_opts(self.opts)
-        self.copy_run_net = self.args.copy_run_net
+        # TODO: make this optional somewhere else
+        self.copy_run_net = True
 
     def _getd(self, dic, key, default=None, required=True):
         val = dic.get(key, default)
         if required and (val is None):
-            sys.exit("{} is not specified in the dictionary")
+            sys.exit("{} is not specified in the dictionary".format(key))
         return val
 
     def _parse_opts(self, opts_dict):
@@ -41,7 +40,7 @@ class BNGL_TO_WE:
         self.fname = self._getd(path_options, "sim_name", default="WE_BNG_sim")
         # Define where the BNG2.pl script is 
         self.bngpl = os.path.join(self.bng_path, "BNG2.pl")
-        # Sampling options 
+        # Sampling options
         sampling_options = self._getd(self.opts, "sampling_options")
         self.tau = self._getd(sampling_options, "tau")
         self.max_iter = self._getd(sampling_options, "max_iter", default=100)
@@ -55,52 +54,26 @@ class BNGL_TO_WE:
         self.center_freq = self._getd(binning_options, "center_freq", default=1)
         self.max_centers = self._getd(binning_options, "max_centers", default=300)
 
-    def _parse_args(self):
-        '''
-        parse arguments passed in the command line
-        '''
-        parser = argparse.ArgumentParser()
-
-        # Data input options
-        parser.add_argument('--options', '-opts',
-                            dest='opts',
-                            required=True,
-                            help='Options YAML file, required',
-                            type=str)
-
-        parser.add_argument('--copy-run-network',
-                            dest='copy_run_net',
-                            action='store_true',
-                            help='If set, copies over the run_network binary')
-
-        self.args = parser.parse_args()
-
     def _load_yaml(self, yfile):
         '''
         internal function that opens a file and loads it in using 
         yaml library
         '''
-        f = open(yfile, "r")
-        y = yaml.load(f)
-        f.close()
+        with open(yfile, "r") as f:
+            y = yaml.load(f)
         return y
     
     def _write_librrPropagator(self):
         lines = [
         'from __future__ import division, print_function; __metaclass__ = type\n',
         'import numpy as np\n',
-        'import west, copy, time, random\n',
-        'from west.propagators import WESTPropagator\n',
+        'import westpa, copy, time, random\n',
+        'from westpa.core.propagators import WESTPropagator\n',
         'import roadrunner as librr\n',
         'import logging\n',
         'log = logging.getLogger(__name__)\n',
         'log.debug(\'loading module %r\' % __name__)\n',
         '# We want to write the librrPropagator here\n',
-        '# TODO: We need to figure out how to\n',
-        '# 1) Start up libRR instances and never let them die until we are done\n',
-        '# 2) Have "propagate" method reset the state, update the concs and then run the SSA\n',
-        '# 3) For now skip gen_istate and we\'ll implement that later, probably not very relevant\n',
-        '# 4) What else do we need?\n',
         'class librrPropagator(WESTPropagator):\n',
         '    def __init__(self, rc=None):\n',
         '        super(librrPropagator,self).__init__(rc)\n',
@@ -125,9 +98,10 @@ class BNGL_TO_WE:
         '        self.runner.setIntegrator("gillespie")\n',
         '        self.runner.setIntegratorSetting(\'gillespie\', \'variable_step_size\', False)\n',
         '        self.runner.setIntegratorSetting(\'gillespie\', \'nonnegative\', True)\n',
-        '        self.pcoord_indices = self.find_pcoord_indices()\n',
         '        self.initial_pcoord = self.get_initial_pcoords()\n',
         '        self.full_state_keys = self.get_full_state_keys()\n',
+        '        # setting time course so our result is just pcoord result\n',
+        '        self.runner.timeCourseSelections = self.runner_config[\'pcoord_keys\']\n'
         '    # Overwriting inhereted methods\n',
         '    def get_pcoord(self, state):\n',
         '        state.pcoord = copy.copy(self.initial_pcoord)\n',
@@ -137,16 +111,6 @@ class BNGL_TO_WE:
         '    # Rest is original class methods, except for propagate ofc\n',
         '    def get_initial_pcoords(self):\n',
         '        return [self.runner[x] for x in self.runner_config[\'pcoord_keys\']]\n',
-        '    def find_pcoord_indices(self):\n',
-        '        inds = []\n',
-        '        for ikey, key in enumerate(self.runner.timeCourseSelections):\n',
-        '            if key in self.runner_config[\'pcoord_keys\']:\n',
-        '                inds.append(ikey)\n',
-        '        return np.array(inds)\n',
-        '    def get_current_pcoords(self, result):\n',
-        '        # Gets the current values of the pcoords set\n',
-        '        # TODO: Experiment with RR to figure out how this works\n',
-        '        return np.array(result[:,self.pcoord_indices])\n',
         '    def get_full_state_keys(self):\n',
         '        # TODO: Is this the best way? More importantly, is this the correct way?\n',
         '        # since RR timecourses are just concs and not the values themselves,\n',
@@ -168,7 +132,7 @@ class BNGL_TO_WE:
         '            starttime = time.time()\n',
         '            seed = random.randint(0,2**14)\n',
         '            # Make sure we are reset so we can set the init state by hand\n',
-        '            self.runner.reset()\n',
+        '            self.runner.resetAll()\n',
         '            # Set a new seed\n',
         '            self.runner.setIntegratorSetting(\'gillespie\', \'seed\', seed)\n',
         '            # Deal with init state here\n',
@@ -187,7 +151,7 @@ class BNGL_TO_WE:
         '            segment.data[\'final_state\'] = self.get_final_state()\n',
         '            segment.data[\'seed\'] = seed\n',
         '            # Get segment pcoords\n',
-        '            segment.pcoord = self.get_current_pcoords(result)\n',
+        '            segment.pcoord = result\n',
         '            # TODO: calc cputime somehow\n',
         '            segment.walltime = time.time() - starttime\n',
         '            segment.cputime = 0\n',
@@ -245,14 +209,12 @@ class BNGL_TO_WE:
         # TODO: Add a hook to write any submission scripts?
         lines = [
           '#!/bin/bash\n',
-          'source env.sh\n',
-          '$WEST_ROOT/bin/w_run --work-manager processes "$@"\n'\
+          'w_run --work-manager processes "$@"\n'\
           ]
 
-        f = open("run.sh", "w")
-        f.writelines(lines)
-        f.close()
-        os.chmod("run.sh", 0764)
+        with open("run.sh", "w") as f:
+            f.writelines(lines)
+        os.chmod("run.sh",0o764)
 
     def _write_envsh(self):
         '''
@@ -263,7 +225,6 @@ class BNGL_TO_WE:
 
         lines = [
             '#!/bin/sh\n',
-            'source {}/westpa.sh\n'.format(self.WESTPA_path),
             'export WEST_SIM_ROOT="$PWD"\n',
             'export SIM_NAME=$(basename $WEST_SIM_ROOT)\n'
             ]
@@ -273,10 +234,9 @@ class BNGL_TO_WE:
         else:
             lines.append('export RunNet="{}/bin/run_network"\n'.format(self.bng_path))
 
-        f = open("env.sh", "w")
-        f.writelines(lines)
-        f.close()
-        os.chmod("env.sh", 0764)
+        with open("env.sh", "w") as f:
+            f.writelines(lines)
+        os.chmod("env.sh", 0o764)
 
     def _write_auxfuncs(self):
         '''
@@ -328,15 +288,14 @@ class BNGL_TO_WE:
             'fi\n'
             ]
 
-        f = open("westpa_scripts/get_pcoord.sh", "w")
-        f.writelines(lines)
-        f.close()
-        os.chmod("westpa_scripts/get_pcoord.sh", 0764)
+        with open("westpa_scripts/get_pcoord.sh", "w") as f:
+            f.writelines(lines)
+        os.chmod("westpa_scripts/get_pcoord.sh", 0o764)
 
     def _write_postiter(self):
         '''
         a basic post-iteration script that deletes iterations that are 
-        older than 3 iterations 
+        older than 3 iterations
         '''
         lines = [
             '#!/bin/bash\n',
@@ -352,29 +311,37 @@ class BNGL_TO_WE:
             'fi\n'
             ]
 
-        f = open("westpa_scripts/post_iter.sh", "w")
-        f.writelines(lines)
-        f.close()
-        os.chmod("westpa_scripts/post_iter.sh", 0764)
+        with open("westpa_scripts/post_iter.sh", "w") as f:
+            f.writelines(lines)
+        os.chmod("westpa_scripts/post_iter.sh", 0o764)
 
-    def _write_initsh(self):
+    def _write_initsh(self, traj=True):
         '''
         WESTPA initialization script
         '''
-        lines = [
-            '#!/bin/bash\n',
-            'source env.sh\n',
-            'rm -rf traj_segs seg_logs istates west.h5 \n',
-            'mkdir   seg_logs traj_segs \n',
-            'cp $WEST_SIM_ROOT/bngl_conf/init.net bstates/0.net\n',
-            'BSTATE_ARGS="--bstate-file bstates/bstates.txt"\n',
-            '$WEST_ROOT/bin/w_init $BSTATE_ARGS --segs-per-state {} --work-manager=threads "$@"'.format(self.traj_per_bin),
-            ]
+        if traj:
+            lines = [
+                '#!/bin/bash\n',
+                'source env.sh\n',
+                'rm -rf traj_segs seg_logs istates west.h5 \n',
+                'mkdir   seg_logs traj_segs \n',
+                'cp $WEST_SIM_ROOT/bngl_conf/init.net bstates/0.net\n',
+                'BSTATE_ARGS="--bstate-file bstates/bstates.txt"\n',
+                'w_init $BSTATE_ARGS --segs-per-state {} --work-manager=threads "$@"'.format(self.traj_per_bin),
+                ]
+        else:
+            lines = [
+                '#!/bin/bash\n',
+                'source env.sh\n',
+                'rm -rf istates west.h5\n',
+                'cp $WEST_SIM_ROOT/bngl_conf/init.net bstates/0.net\n',
+                'BSTATE_ARGS="--bstate-file bstates/bstates.txt"\n',
+                'w_init $BSTATE_ARGS --segs-per-state {} --work-manager=threads "$@"'.format(self.traj_per_bin),
+                ]
 
-        f = open("init.sh", "w")
-        f.writelines(lines)
-        f.close()
-        os.chmod("init.sh", 0764)
+        with open("init.sh", "w") as f:
+            f.writelines(lines)
+        os.chmod("init.sh", 0o764)
 
     def _write_systempy(self):
         '''
@@ -384,9 +351,9 @@ class BNGL_TO_WE:
         lines = [
             'from __future__ import division, print_function; __metaclass__ = type\n',
             'import numpy as np\n',
-            'import west\n',
-            'from west import WESTSystem\n',
-            'from westpa.binning import VoronoiBinMapper\n',
+            'import westpa\n',
+            'from westpa import WESTSystem\n',
+            'from westpa.core.binning import VoronoiBinMapper\n',
             'from scipy.spatial.distance import cdist\n',
             'import logging\n',
             'log = logging.getLogger(__name__)\n',
@@ -450,7 +417,7 @@ class BNGL_TO_WE:
             '      - name:        final_state \n',
             '        scaleoffset: 4\n',
             '  plugins:\n',
-            '    - plugin: westext.adaptvoronoi.AdaptiveVoronoiDriver\n',
+            '    - plugin: westpa.westext.adaptvoronoi.AdaptiveVoronoiDriver\n',
             '      av_enabled: true\n',
             '      dfunc_method: system.dfunc\n',
             '      walk_count: {}\n'.format(self.traj_per_bin),
@@ -584,21 +551,22 @@ class BNGL_TO_WE:
             'fi\n'
             ]
 
-        f = open("westpa_scripts/runseg.sh", "w")
-        f.writelines(lines)
-        f.close()
-        os.chmod("westpa_scripts/runseg.sh", 0764)
+        with open("westpa_scripts/runseg.sh", "w") as f:
+            f.writelines(lines)
+        os.chmod("westpa_scripts/runseg.sh", 0o764)
 
     def write_dynamic_files(self):
         '''
         these files change depending on the given options, in particular
         sampling and binning options
         '''
-        self._write_initsh()
         self._write_systempy()
         self._write_westcfg()
         if self.propagator_type == "executable":
             self._write_runsegsh()
+            self._write_initsh(traj=True)
+        else:
+            self._write_initsh(traj=False)
 
     def write_static_files(self):
         '''
@@ -636,7 +604,7 @@ class BNGL_TO_WE:
         '''
         # Assumes path is absolute path and not relative
         shutil.copyfile(os.path.join(self.bng_path, "bin/run_network"), "bngl_conf/run_network")
-        os.chmod("bngl_conf/run_network",0764)
+        os.chmod("bngl_conf/run_network",0o764)
 
     def run_BNGL_on_file(self):
         '''
@@ -651,23 +619,15 @@ class BNGL_TO_WE:
 
     def _libRR_BNGL_on_file(self):
         # We still need this stuff
-        self._executable_BNGL_on_file()
+        model = self._executable_BNGL_on_file()
         # But we also need to generate the XML file
         # get in the conf folder
         os.chdir("bngl_conf")
         # make a copy that we will use to generat the XML
-        shutil.copyfile(self.bngl_file, "gen_xml.bngl")
-        with open("gen_xml.bngl", "a") as f:
-            f.write('generate_network({overwrite=>1});\n')
-            f.write('writeSBML({})\n')
-        proc = sbpc.Popen([self.bngpl, "gen_xml.bngl"])
-        proc.wait()
-        assert proc.returncode == 0, "call to BNG2.pl failed, make sure it's in your PATH"
-        shutil.copyfile("gen_xml_sbml.xml", "init.xml")
-        os.remove("gen_xml_sbml.xml")
-        os.remove("gen_xml.bngl")
-        os.remove("gen_xml.net")
-        # return to main simulation folder
+        sim = model.setup_simulator()
+        sbml_str = sim.simulator.getCurrentSBML()
+        with open("init.xml", "w") as f:
+            f.write(str(sbml_str))
         os.chdir(os.path.join(self.main_dir, self.sim_dir))
 
     def _executable_BNGL_on_file(self):
@@ -677,42 +637,21 @@ class BNGL_TO_WE:
         os.chdir("bngl_conf")
         # Make specific BNGL files for a) generating network and then 
         # b) getting a starting  gdat file
-        shutil.copyfile(self.bngl_file, "init.bngl")
-        shutil.copyfile(self.bngl_file, "for_network.bngl")
-        with open("for_network.bngl", "a") as f:
-            # Adding directives to generate the files we want
-            f.write('generate_network({overwrite=>1});\n')
-        shutil.copyfile(self.bngl_file, "for_gdat.bngl")
-        with open("for_gdat.bngl", "a") as f:
-            # Adding directives to generate the files we want
-            f.write('generate_network({overwrite=>1});\n')
-            f.write('simulate({method=>"ssa",t_end=>2,n_steps=>1});\n')
-        # run BNG2.pl on things to get the files we need
-        proc = sbpc.Popen([self.bngpl, "for_network.bngl"])
-        proc.wait()
-        assert proc.returncode == 0, "call to BNG2.pl failed, make sure it's in your PATH"
-        # copy our network back
-        shutil.copyfile("for_network.net", "init.net")
-        os.remove("for_network.bngl")
-        os.remove("for_network.net")
-        # run on gdat 
-        proc = sbpc.Popen([self.bngpl, "for_gdat.bngl"])
-        proc.wait()
-        assert proc.returncode == 0, "call to BNG2.pl failed, make sure it's in your PATH"
-        # edit the gdat file to get rid of the last line
-        f = open("for_gdat.gdat", "r")
-        l = f.readlines()
-        f.close()
-        # Now write the first two lines to init.gdat
-        f = open("init.gdat", "w")
-        f.writelines(l[:2])
-        f.close()
-        os.remove("for_gdat.bngl")
-        os.remove("for_gdat.net")
-        os.remove("for_gdat.cdat")
-        os.remove("for_gdat.gdat")
-        # return to main simulation folder
+        model = bionetgen.bngmodel(self.bngl_file)
+        model.add_action("generate_network", action_args=[("overwrite",1)])
+        model.add_action("simulate", action_args=[("method","ssa"),("t_end",2),("n_steps",2)])
+        with open("init.bngl", "w") as f:
+            f.write(str(model))
+        r = bionetgen.run("init.bngl", "for_init").results["init"]
+        shutil.copyfile("init.net", os.path.join("..","init.net"))
+        header_str = ""
+        for i in r.dtype.names: header_str += " " + i
+        np.savetxt(os.path.join("..","init.gdat"), [list(r[0])], header=header_str)
+        # move up and remove the useless folder
+        os.chdir("..")
+        shutil.rmtree("for_init")
         os.chdir(os.path.join(self.main_dir, self.sim_dir))
+        return model
 
     def run(self):
         '''
