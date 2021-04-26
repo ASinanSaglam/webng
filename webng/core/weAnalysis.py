@@ -1,5 +1,5 @@
 import sys,yaml
-from webng.analysis import weAverage, weEvolution, weCluster, weNetwork
+from webng.analysis import weAverage, weEvolution # , weCluster, weNetwork
 
 class weAnalysis:
     def __init__(self, args) -> None:
