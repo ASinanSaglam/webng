@@ -4,7 +4,7 @@ import subprocess as sbpc
 
 # TODO: Expose more functionality to the options file
 # especially some of them can be optionally exposed
-class BNGL_TO_WE:
+class weConvert:
     def __init__(self, args):
         '''
         take arguments from cement app and get ready to write
@@ -665,7 +665,3 @@ class BNGL_TO_WE:
         self.run_BNGL_on_file()
         self.write_dynamic_files()
         return
-
-if __name__ == "__main__":
-    btw = BNGL_TO_WE()
-    btw.run()

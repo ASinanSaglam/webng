@@ -18,9 +18,6 @@ webng:
 ### The log handler label
 # log_handler: colorlog
 
-### The output handler label
-# output_handler: jinja2
-
 ### sample foo option
 # foo: bar
 

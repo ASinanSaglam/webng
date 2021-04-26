@@ -139,7 +139,8 @@ class weTemplater:
         for an_key in self.template_dict["analyses"].keys():
             if an_key == "enabled":
                 continue
-            self.template_dict["analyses"][an_key]["work-path"] = os.path.join(self.template_dict["path_options"]["sim_name"], "analysis")
+            self.template_dict["analyses"][an_key]["work-path"] = \
+                os.path.join(self.template_dict["path_options"]["sim_name"], "analysis")
 
     def run(self):
         ystr = yaml.dump(self.template_dict)
