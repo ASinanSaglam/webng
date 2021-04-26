@@ -3,7 +3,7 @@ import cement
 from cement.core.exc import CaughtSignal
 from .core.exc import weBNGError
 from .controllers.base import Base
-from .core.bng_to_we import BNGL_TO_WE
+from .core.weConvert import weConvert
 from .core.weTemplater import weTemplater
 from .core.weAnalysis import weAnalysis
 
@@ -24,6 +24,8 @@ class weBNGBase(cement.Controller):
         creates a WESTPA folder ready to run form a given options YAML file
     template
         generates a simple template YAML file to pass to setup subcommand
+    analysis
+        runs the analyses set in the YAML config file
     '''
 
     class Meta:
@@ -50,7 +52,7 @@ class weBNGBase(cement.Controller):
         See \"webng template -h\" for more information on the options YAML file.
         '''
         args = self.app.pargs
-        BNGL_TO_WE(args).run()
+        weConvert(args).run()
     
     @cement.ex(
             help="Writes a template options file for a WESTPA simulation using a BNGL model.",
@@ -88,7 +90,7 @@ class weBNGBase(cement.Controller):
         The analysis subcommand 
         '''
         args = self.app.pargs
-        weAnalysis(args.opts).run()
+        weAnalysis(args).run()
 
 
 
@@ -110,7 +112,6 @@ class weBNG(cement.App):
         extensions = [
             'yaml',
             'colorlog',
-            'jinja2',
         ]
 
         # configuration handler
@@ -121,9 +122,6 @@ class weBNG(cement.App):
 
         # set the log handler
         log_handler = 'colorlog'
-
-        # set the output handler
-        output_handler = 'jinja2'
 
         # register handlers
         handlers = [

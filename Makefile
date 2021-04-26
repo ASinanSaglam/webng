@@ -12,12 +12,7 @@ virtualenv:
 	@echo
 
 test:
-	python -m pytest \
-		-v \
-		--cov=webng \
-		--cov-report=term \
-		--cov-report=html:coverage-report \
-		tests/
+	python -m pytest tests/
 
 docker: clean
 	docker build -t webng:latest .
