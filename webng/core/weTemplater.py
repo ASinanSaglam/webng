@@ -51,8 +51,6 @@ class weTemplater:
                     "avg_window": None,
                     "plot-opts": {
                         "name-font-size": 12,
-                        "voronoi-lw": 1,
-                        "voronoi-col": 0.75
                     }
                 },
                 # "cluster": {

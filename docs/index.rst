@@ -3,7 +3,7 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-webng - Weighted ensemble sampling of BNGL models
+webng - WE sampling of BNGL models
 =================================================
 
 .. toctree::
@@ -25,7 +25,7 @@ The tool also includes some sample analyses that are specifically tailored for B
 Installation
 ############
 
-The suggested python distribution to use `Anaconda python distribution <https://www.anaconda.com/download/>`_.
+The suggested python distribution to use is the `Anaconda python distribution <https://www.anaconda.com/download/>`_.
 After that is installed, you can install webng directly from PyPI using pip
 
 .. code-block:: shell
@@ -107,7 +107,7 @@ or you can use multiple cores with the command
 
    w_run --n-workers X
 
-where X is the number of cores you want to use. In order to extend the simulation further you 
+where :code:`X` is the number of cores you want to use. In order to extend the simulation further you 
 will have to edit :code:`west.cfg` file, please read `WESTPA tutorials <https://github.com/westpa/westpa/wiki/Tutorials>`_
 to learn how to run and manage these simulations.
 
@@ -123,33 +123,31 @@ look like this
    analyses:
       enabled: false
       average:
-         dimensions: null
-         enabled: false
-         first-iter: null
-         last-iter: null
-         mapper-iter: null
-         normalize: false
-         output: average.png
-         plot-energy: false
-         plot-opts:
+         dimensions: null # you can limit the tool to the first N dimensions
+         enabled: false # this needs to be set to true to run the analysis 
+         first-iter: null # first iteration to start the averaging
+         last-iter: null # first iteration to end the averaging
+         mapper-iter: null # the iteration to pull the voronoi bin mapper from, last iteration by default
+         normalize: false # normalizes the distributions
+         output: average.png # output file name 
+         plot-energy: false # plots -ln of probabilies
+         plot-opts: # various plotting options like font sizes and line width
             name-font-size: 12
             voronoi-col: 0.75
             voronoi-lw: 1
-         plot-voronoi: false
-         smoothing: 0.5
-         work-path: /home/USER/webng/testing/test/analysis
+         plot-voronoi: false # true if you want to plot voronoi centers
+         smoothing: 0.5 # the amount of smoothing to apply
+         work-path: /home/USER/webng/testing/test/analysis # the folder to run the analysis under
       evolution:
-         avg_window: null
-         dimensions: null
-         enabled: false
-         normalize: false
-         output: evolution.png
-         plot-energy: false
-         plot-opts:
+         avg_window: null # number of iterations to average for each point in the plot
+         dimensions: null # you can limit the tool to the first N dimensions
+         enabled: false # this needs to be set to true to run the analysis
+         normalize: false # normalizes the distributions
+         output: evolution.png # output file name 
+         plot-energy: false # plots -ln of probabilies
+         plot-opts: # various plotting options like font sizes and line width
             name-font-size: 12
-            voronoi-col: 0.75
-            voronoi-lw: 1
-         work-path: /home/USER/webng/testing/test/analysis
+         work-path: /home/USER/webng/testing/test/analysis # the folder to run the analysis under
 
 In this file you can set various analysis options. :code:`average` will create a 
 N by N set of plots where N is the number of observables you have in the BNG model 
