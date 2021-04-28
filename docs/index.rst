@@ -3,8 +3,8 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-webng: 
-=================================
+webng - Weighted ensemble sampling of BNGL models
+=================================================
 
 .. toctree::
    :maxdepth: 2
@@ -48,6 +48,7 @@ if this command prints out help, the command line tool is installed.
 
 In order to use the tool, you will need a YAML configuration file. This tool comes with a 
 subcommand that can generate a template YAML config file for you with the command
+
 .. code-block:: shell
 
    webng template -i mymodel.bngl -o mysim.yaml
