@@ -123,4 +123,4 @@ The analysis `evolution` will make a probability distribution evolution plot for
 
 ## Note
 
-This repo is still heavily under construction, please let me know if you have any issues by reporting your issue under [github issues page](https://github.com/ASinanSaglam/BNG_WESTPA_pipeline/issues)
+This repo is still heavily under construction, please let me know if you have any issues by reporting your issue under [github issues page](https://github.com/ASinanSaglam/webng/issues)
