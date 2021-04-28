@@ -3,7 +3,7 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-webng: A command line tool for setting up WESTPA simulations of BioNetGen models
+webng: 
 =================================
 
 .. toctree::
@@ -20,8 +20,9 @@ sample these events.
 
 TODO: Links for SSA
 
-This tool is designed to simplify the installation of BNG and WESTPA while also providing a simple
-pipeline to get a WESTPA simulation setup of a model written in BNGL. 
+webng is a command line tool designed to simplify the installation of BNG and WESTPA while 
+also providing a simplepipeline to get a WESTPA simulation setup of a model written in BNGL. 
+The tool also includes some sample analyses that are specifically tailored for BNGL models. 
 
 Indices and tables
 ==================
