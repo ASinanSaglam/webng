@@ -5,8 +5,7 @@ name: webng-main
 
 on: 
   push:
-    branches:
-      - main
+    branches: [ master ]
 
 jobs:
   deploy:
