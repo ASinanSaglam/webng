@@ -1,7 +1,7 @@
 import westpa, bionetgen, yaml, os, platform
 
 class weTemplater:
-    '''
+    """
     This is the class that will be used by the command line tool when it's 
     called with the subcommand `webng template`.
 
@@ -10,7 +10,7 @@ class weTemplater:
 
     The `run` method will write a template webng config file using the given 
     options as well as paths acquired from imported libraries.
-    '''
+    """
     def __init__(self, args):
         # get arguments
         self.inp_file = args.input

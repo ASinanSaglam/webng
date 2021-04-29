@@ -181,12 +181,12 @@ def pull_weight(n_iter, iter_group):
 # Copyright (C) 2011  Nicolas P. Rougier
 
 def circumcircle(P1,P2,P3):
-    ''' 
+    """
     Used for plotting voronoi center in `average` analysis. 
     
     Adapted from:
     http://local.wasp.uwa.edu.au/~pbourke/geometry/circlefrom3/Circle.cpp
-    '''
+    """
     delta_a = P2 - P1
     delta_b = P3 - P2
     if np.abs(delta_a[0]) <= 0.000000001 and np.abs(delta_b[1]) <= 0.000000001:

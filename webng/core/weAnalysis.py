@@ -2,7 +2,7 @@ import sys,yaml
 from webng.analysis import weAverage, weEvolution # , weCluster, weNetwork
 
 class weAnalysis:
-    '''
+    """
     This is the core analysis class that will be used by the command line 
     tool when called with the subcommand `webng analysis`. 
 
@@ -10,7 +10,7 @@ class weAnalysis:
     for initialization and when you use the `run` method it will go through
     the dictionary, calling the appropriate analysis tools with the subdictionaries
     of each, in the appropriate order. 
-    '''
+    """
     def __init__(self, args) -> None:
         with open(args.opts, "r") as f:
             opt_dict = yaml.load(f)

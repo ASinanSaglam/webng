@@ -5,7 +5,7 @@ import subprocess as sbpc
 # TODO: Expose more functionality to the options file
 # especially some of them can be optionally exposed
 class weConvert:
-    '''
+    """
     This is the class that will be used by the command line tool when it's 
     called with the subcommand `webng setup`. 
     
@@ -14,7 +14,7 @@ class weConvert:
 
     The `run` method will use the parsed options and make the WESTPA simulation folder
     using the templates it contains. TODO: Use jinja for templating instead. 
-    '''
+    """
     def __init__(self, args):
         '''
         take arguments from cement app and get ready to write
