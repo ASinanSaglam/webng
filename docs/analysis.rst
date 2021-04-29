@@ -10,7 +10,7 @@ Analysis
  
 
 In the :code:`mysim.yaml` file you created you should see an analysis section. To 
-learn more about the options, please see :ref:`configuration options` page. The analyses
+learn more about the available options, please see :ref:`config` page. The analyses
 can be ran using the command
 
 .. code-block:: shell

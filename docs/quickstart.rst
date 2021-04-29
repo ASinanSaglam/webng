@@ -35,9 +35,9 @@ subcommand that can generate a template YAML config file for you with the comman
 
    webng template -i mymodel.bngl -o mysim.yaml
 
-this should write a sample configuraion file to :code:`mysim.yaml`. See :ref:`configuration
-options` page to learn more about what is contained in this file. Next let's actually
-make the WESTPA simulation folder with
+this should write a sample configuration file to :code:`mysim.yaml`. See :ref:`config` page to
+learn more about what is contained in this file. Next let's actually make the WESTPA simulation 
+folder with
 
 .. code-block:: shell
 
