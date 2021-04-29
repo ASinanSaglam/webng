@@ -36,11 +36,3 @@ Evolution
 
 The analysis :code:`evolution` will make a probability distribution evolution plot for 
 each observable so you can track the progress of your simulation.
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`

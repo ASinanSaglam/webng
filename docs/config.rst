@@ -106,11 +106,4 @@ to set if that particular analysis will be ran or not.
       smoothing: 0.5 # the amount of smoothing to apply
       work-path: /home/USER/webng/testing/test/analysis # the folder to run the analysis under
 
-This is the block for :ref:`Average`. 
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+This is the block for :ref:`Average`.
