@@ -10,6 +10,7 @@ Simulation setup options
 The section that's relevant for the simulation setup should look something like this:
 
 .. code-block:: yaml
+   :linenos:
 
    binning_options:
       block_size: 10 # Number of trajectories to be processed in blocks
@@ -41,7 +42,7 @@ When you first create a setup configuration file like :code:`mysim.yaml`, you wi
 an analysis section like this
 
 .. code-block:: yaml
-    :linenos:
+   :linenos:
 
    analyses:
       enabled: false

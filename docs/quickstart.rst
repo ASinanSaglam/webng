@@ -68,7 +68,7 @@ where :code:`X` is the number of cores you want to use. In order to extend the s
 will have to edit :code:`west.cfg` file, please read `WESTPA tutorials <https://github.com/westpa/westpa/wiki/Tutorials>`_
 to learn how to run and manage these simulations.
 
-See analysis page to learn more about the available analyses in webng. 
+See :ref:`analysis` page to learn more about the available analyses in webng. 
 
 Indices and tables
 ==================
