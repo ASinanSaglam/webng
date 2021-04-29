@@ -7,14 +7,6 @@
 WEBNG - WE sampling of BNGL models
 ==================================
 
-.. toctree::
-   :maxdepth: 2
-   :caption: Contents:
-
-   quickstart
-   config
-   analysis
-
 `BioNetgen (BNG) <http://bionetgen.org/>`_ is a modelling language for rule-based 
 modelling of complex biological systems. `WESTPA <https://github.com/westpa/westpa>`_ is a
 python package that implements the weighted ensemble sampling scheme which focuses compuational
@@ -23,11 +15,19 @@ power to sample rare events in stochastic simulations. Models written with BioNe
 algorightm (SSA). This can lead to rare events which are hard to sample and WESTPA can help
 sample these events. 
 
-webng is a command line tool designed to simplify the installation of BNG and WESTPA while 
+WEBNG is a command line tool designed to simplify the installation of BNG and WESTPA while 
 also providing a simplepipeline to get a WESTPA simulation setup of a model written in BNGL. 
 The tool also includes some sample analyses that are specifically tailored for BNGL models. 
 
 Please see :ref:`quickstart` page to learn how to use webng.
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Contents:
+
+   quickstart
+   config
+   analysis
 
 ..  Warning::  This documentation is still a work in progress and is incomplete.
 

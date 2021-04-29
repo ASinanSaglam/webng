@@ -2,11 +2,6 @@
 Configuration Options
 =====================
 
-.. toctree::
-   :maxdepth: 2
-   :caption: Contents:
-
-
 Simulation setup options
 ########################
 
@@ -75,6 +70,7 @@ an analysis section like this
             name-font-size: 12
          work-path: /home/USER/webng/testing/test/analysis # the folder to run the analysis under
 
+Let's take a look at individual sections. 
 
 Indices and tables
 ==================

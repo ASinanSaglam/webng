@@ -2,12 +2,8 @@
 Quick Start
 ============
 
-.. toctree::
-   :maxdepth: 2
-   :caption: Contents:
-
-:ref:Installation
-#################
+Installation
+############
 
 The suggested python distribution to use is the `Anaconda python distribution <https://www.anaconda.com/download/>`_.
 After that is installed, you can install webng directly from PyPI using pip
