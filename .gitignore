@@ -103,13 +103,3 @@ venv.bak/
 
 # mypy
 .mypy_cache/
-
-simple_testing
-*.pyc
-*.h5
-*.png
-*.pdf
-*.txt
-*.npy
-*.pkl
-*.gml

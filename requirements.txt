@@ -1,0 +1,6 @@
+numpy>=1.14.0
+cement>=3.0.4
+pyyaml
+colorlog
+westpa
+h5py
