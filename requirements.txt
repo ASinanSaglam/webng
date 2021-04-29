@@ -3,4 +3,5 @@ cement
 pyyaml
 colorlog
 h5py
+bionetgen
 westpa

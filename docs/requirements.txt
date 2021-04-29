@@ -1,6 +1,0 @@
-numpy
-cement
-pyyaml
-colorlog
-h5py
-westpa
