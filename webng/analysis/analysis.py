@@ -1,6 +1,9 @@
 import sys, os
 
 class weAnalysis:
+    '''
+    Base class for all analysis classes.
+    '''
     def __init__(self, opts):
         # get this in so we can import system.py if need be
         sys.path.append(opts["sim_name"])

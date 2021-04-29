@@ -182,6 +182,8 @@ def pull_weight(n_iter, iter_group):
 
 def circumcircle(P1,P2,P3):
     ''' 
+    Used for plotting voronoi center in `average` analysis. 
+    
     Adapted from:
     http://local.wasp.uwa.edu.au/~pbourke/geometry/circlefrom3/Circle.cpp
     '''
@@ -214,6 +216,9 @@ def circumcircle(P1,P2,P3):
     return center_x, center_y
 
 def voronoi(X,Y):
+    '''
+    Used for plotting voronoi center in `average` analysis. 
+    '''
     P = np.zeros((X.size+4,2))
     P[:X.size,0], P[:Y.size,1] = X, Y
     # We add four points at "infinity"

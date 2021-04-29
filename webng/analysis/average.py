@@ -16,6 +16,17 @@ warnings.filterwarnings("ignore")
 # TODO: Hook into native code to decouple some parts like # of dimensions etc.
 # we need the system.py anyway, let's use native code to read CFG file
 class weAverage(weAnalysis):
+    '''
+    Class for the averaging analysis. 
+
+    This tool creates a N by N matrix-like plot where N is the number of observables
+    in the BNGL tool (unless overridden by the `dimensions` option). The diagonal 
+    will contain 1D probability distributions and off diagonals will contain 2D probability
+    heatmaps of each dimension vs each other dimension. 
+
+    This tool uses `w_pdist` WESTPA tool to calculate probabilty distributions hence 
+    it needs `w_pdist` to be accessible directly from the commandline. 
+    '''
     def __init__(self, opts):
         super().__init__(opts)
         # Once the arguments are parsed, do a few prep steps, opening h5file

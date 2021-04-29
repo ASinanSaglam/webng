@@ -15,6 +15,16 @@ warnings.filterwarnings("ignore")
 # TODO: Hook into native code to decouple some parts like # of dimensions etc.
 # we need the system.py anyway, let's use native code to read CFG file
 class weEvolution(weAnalysis):
+    '''
+    Class for the evolution analysis. 
+
+    This tool creates N plots where N is the number of observables (unless overridden by 
+    the `dimensions` option). Each plot contains the evolution of the 1D probability distirubion
+    over WE iterations. 
+
+    This tool uses `w_pdist` WESTPA tool to calculate probabilty distributions hence 
+    it needs `w_pdist` to be accessible directly from the commandline. 
+    '''
     def __init__(self, opts):
         super().__init__(opts)
         # keep it around
