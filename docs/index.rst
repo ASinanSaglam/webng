@@ -160,6 +160,7 @@ of each pair of observables.
 The analysis :code:`evolution` will make a probability distribution evolution plot for 
 each observable so you can track the progress of your simulation.
 
+For more detailed infromation please go to :doc:`configuration options <./config.rst>` page.
 
 Indices and tables
 ==================
