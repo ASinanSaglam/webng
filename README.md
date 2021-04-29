@@ -1,5 +1,8 @@
 # A weighted ensemble simulation setup tool for BioNetGen models
 
+
+[![WEBNG build status](https://github.com/ASinanSaglam/webng/workflows/webng-main/badge.svg)](https://github.com/ASinanSaglam/webng/actions) [![WEBNG RTD documentation status](https://readthedocs.org/projects/webng/badge/?version=latest&style=plastic)](https://readthedocs.org/projects/webng/badge/?version=latest&style=plastic)
+
 This is a command line tool to setup [WESTPA](https://github.com/westpa/westpa) simulations of [BioNetGen](http://bionetgen.org/) models. 
 
 ## Installation
