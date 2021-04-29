@@ -2,6 +2,7 @@ numpy
 cement
 pyyaml
 colorlog
+seaborn
 h5py
 bionetgen
 westpa
