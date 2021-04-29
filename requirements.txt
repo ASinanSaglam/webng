@@ -1,5 +1,5 @@
-numpy>=1.14.0
-cement>=3.0.4
+numpy
+cement
 pyyaml
 colorlog
 westpa
