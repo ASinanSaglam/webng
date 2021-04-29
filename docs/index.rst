@@ -3,9 +3,9 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-==================================
+##################################
 WEBNG - WE sampling of BNGL models
-==================================
+##################################
 
 `BioNetgen (BNG) <http://bionetgen.org/>`_ is a modelling language for rule-based 
 modelling of complex biological systems. `WESTPA <https://github.com/westpa/westpa>`_ is a

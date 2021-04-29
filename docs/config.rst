@@ -1,11 +1,11 @@
 .. _config:
 
-=====================
+#####################
 Configuration Options
-=====================
+#####################
 
 Simulation setup options
-########################
+========================
 
 The section that's relevant for the simulation setup should look something like this:
 
@@ -35,8 +35,9 @@ The section that's relevant for the simulation setup should look something like 
 
 you can change various aspects of the simulation setup in this file.
 
+
 Analysis options
-################
+================
 
 When you first create a setup configuration file like :code:`mysim.yaml`, you will see
 an analysis section like this
@@ -74,6 +75,38 @@ an analysis section like this
          work-path: /home/USER/webng/testing/test/analysis # the folder to run the analysis under
 
 Let's take a look at individual sections. 
+
+.. code-block:: yaml
+   :linenos:
+
+   analyses:
+      enabled: false
+
+This is upper level analysis block and has a single option called :code:`enabled`. If set to false,
+none of the analyses will run. Each analysis subsection will have the same :code:`enabled` option
+to set if that particular analysis will be ran or not.
+
+.. code-block:: yaml
+   :linenos:
+
+   average:
+      dimensions: null # you can limit the tool to the first N dimensions
+      enabled: false # this needs to be set to true to run the analysis 
+      first-iter: null # first iteration to start the averaging
+      last-iter: null # first iteration to end the averaging
+      mapper-iter: null # the iteration to pull the voronoi bin mapper from, last iteration by default
+      normalize: false # normalizes the distributions
+      output: average.png # output file name 
+      plot-energy: false # plots -ln of probabilies
+      plot-opts: # various plotting options like font sizes and line width
+         name-font-size: 12
+         voronoi-col: 0.75
+         voronoi-lw: 1
+      plot-voronoi: false # true if you want to plot voronoi centers
+      smoothing: 0.5 # the amount of smoothing to apply
+      work-path: /home/USER/webng/testing/test/analysis # the folder to run the analysis under
+
+This is the block for :ref:`Average`. 
 
 Indices and tables
 ==================

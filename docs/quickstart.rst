@@ -1,11 +1,11 @@
 .. _quickstart:
 
-============
+###########
 Quick Start
-============
+###########
 
 Installation
-############
+============
 
 The suggested python distribution to use is the `Anaconda python distribution <https://www.anaconda.com/download/>`_.
 After that is installed, you can install webng directly from PyPI using pip
@@ -18,7 +18,7 @@ which will also install WESTPA and BioNetGen python libraries which means you on
 run this command and have your model to run a WESTPA simulation. 
 
 Usage
-#####
+=====
 
 After installation complete you can test to see if it's properly installed with
 
@@ -29,7 +29,7 @@ After installation complete you can test to see if it's properly installed with
 if this command prints out help, the command line tool is installed.
 
 In order to use the tool, you will need a YAML configuration file. This tool comes with a 
-subcommand that can generate a template YAML config file for you with the command
+subcommand that can generate a template YAML configuration file for you with the command
 
 .. code-block:: shell
 

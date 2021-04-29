@@ -1,14 +1,13 @@
 .. _analysis:
 
-========
+########
 Analysis
-========
+########
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
  
-
 In the :code:`mysim.yaml` file you created you should see an analysis section. To 
 learn more about the available options, please see :ref:`config` page. The analyses
 can be ran using the command
@@ -19,8 +18,11 @@ can be ran using the command
 
 and webng will run the analyses using the configuration options given by the file. 
 
+Probability distribution analyses
+=================================
+
 Average
-~~~~~~~
+-------
 
 :code:`average` will create a N by N set of plots where N is the number of observables 
 you have in the BNG model after running the appropriate WESTPA tools. The results will 
@@ -30,7 +32,7 @@ contains 1D probability distributions of each observable and every off-diagonal 
 2D probability heatmap of each pair of observables.
 
 Evolution
-~~~~~~~~~
+---------
 
 The analysis :code:`evolution` will make a probability distribution evolution plot for 
 each observable so you can track the progress of your simulation.
