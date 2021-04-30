@@ -1,7 +1,7 @@
 import pickle, h5py, os, shutil
 from sys import stdout
 import numpy as np
-import pyemma as pe
+import pygpcca as pgp
 import subprocess as sbpc
 from scipy.sparse import coo_matrix
 from webng.analysis.analysis import weAnalysis
@@ -135,24 +135,42 @@ class weCluster(weAnalysis):
     def print_pcca_results(self):
         '''
         '''
-        print("##### Clustering results #####")
-        print("MSM probs")
-        print(self.p*100)
-        print("MSM TM")
-        print(self.ctm*100)
+        print("#########################")
+        print("crispness vals")
+        print(self.pcca.crispness_values)
+        print("optimal crisp")
+        print(self.pcca.optimal_crispness)
+        print("n_m")
+        print(self.pcca.n_m)
+        print("top eig")
+        print(self.pcca.top_eigenvalues)
+        print("dom eig")
+        print(self.pcca.dominant_eigenvalues)
+        print("memberships")
+        print(self.pcca.memberships)
+        print("stat prob")
+        print(self.pcca.stationary_probability)
+        print("coarse grained tm")
+        print(self.pcca.coarse_grained_transition_matrix)
+        print("coarse grained probs")
+        print(self.pcca.coarse_grained_stationary_probability)
+        print("#########################")
 
     def cluster(self):
         '''
         '''
         print("##### Clustering #####")
         self.preprocess_tm()
-
-        self.MSM = pe.msm.MSM(self.tm, reversible=True)
-        self.pcca = self.MSM.pcca(self.cluster_count)
+        dims = self.tm.shape[0]
+        self.pcca = pgp.GPCCA(self.tm, z='LM', method='brandts')
+        print(self.pcca.minChi(self.cluster_count,dims))
+        self.pcca.optimize({'m_min':self.cluster_count,'m_max':dims}) 
         self.p = self.pcca.coarse_grained_stationary_probability
         self.ctm = self.pcca.coarse_grained_transition_matrix
-        self.mstable_assignments = self.pcca.metastable_assignment
-        self.max_mstable_states = self.mstable_assignments.max()
+        self.assignments = []
+        for i in range(self.pcca.memberships.shape[0]):
+            self.assignments.append(np.where(self.pcca.memberships[i,:] == max(self.pcca.memberships[i,:]))[0][0])
+        self.assignments = np.array(self.assignments)
         self.print_pcca_results()
 
     def save_pcca(self):
@@ -205,7 +223,7 @@ class weCluster(weAnalysis):
         '''
         '''
         # TODO: OBJify
-        mstab_ass = self.mstable_assignments
+        mstab_ass = self.assignments
         mstabs = []
         li = 0
         for i in self.z_inds[0]:
@@ -229,7 +247,7 @@ class weCluster(weAnalysis):
         '''
         print("##### Metastable states info #####")
         self.load_bin_arrays()
-        a = self.mstable_assignments
+        a = self.assignments
         # TODO: OBJify
         print("NAMES: ", self.names)
         width = 6

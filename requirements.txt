@@ -4,5 +4,6 @@ pyyaml
 colorlog
 seaborn
 h5py
+pygpcca
 bionetgen
 westpa

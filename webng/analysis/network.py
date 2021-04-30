@@ -55,7 +55,7 @@ class weNetwork(weAnalysis):
         # Get the dictionary
         self.state_label_dict = dict(zip(range(len(self.state_labels)), self.state_labels))
         # Use matplotlib to pull colors for every state
-        self.state_colors = {0: "#FF00FF", 1: "#000000", 2: "#FF0000", 3:"#0000FF"}
+        self.state_colors = {0: "#FF00FF", 1: "#000000", 2: "#FF0000", 3:"#0000FF", 4: "#FFFFFF"}
         return
 
     def get_full_network(self):
