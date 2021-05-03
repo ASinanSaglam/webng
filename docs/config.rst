@@ -86,6 +86,8 @@ This is upper level analysis block and has a single option called :code:`enabled
 none of the analyses will run. Each analysis subsection will have the same :code:`enabled` option
 to set if that particular analysis will be ran or not.
 
+.. _average:
+
 Average
 -------
 
@@ -111,6 +113,8 @@ Average
 
 This is the block for :ref:`Average analysis`.
 
+.. _evolution:
+
 Evolution
 ---------
 
@@ -129,6 +133,8 @@ Evolution
       work-path: /home/USER/webng/testing/test/analysis # the folder to run the analysis under
 
 This is the block for :ref:`Evolution analysis`.
+
+.. _cluster:
 
 Cluster
 -------
@@ -158,6 +164,8 @@ Cluster
       work-path: /home/boltzmann/webng/stest/test/analysis
 
 This is the block for :ref:`Cluster analysis`.
+
+.. _network:
 
 Network
 -------

@@ -21,6 +21,8 @@ and webng will run the analyses using the configuration options given by the fil
 Probability distribution analyses
 =================================
 
+.. _average_analysis: 
+
 Average analysis
 ----------------
 
@@ -31,6 +33,8 @@ to :code:`average.png`). The plot will look like a matrix of plots where the dia
 contains 1D probability distributions of each observable and every off-diagonal will be a 
 2D probability heatmap of each pair of observables.
 
+.. _evolution_analysis: 
+
 Evolution analysis
 ------------------
 
@@ -40,6 +44,8 @@ each observable so you can track the progress of your simulation.
 Clustering and network analyses
 ===============================
 
+.. _cluster_analysis: 
+
 Clustering analysis
 -------------------
 
@@ -48,6 +54,8 @@ simulation and do `PCCA+ clustering <https://link.springer.com/article/10.1007/s
 This type of clustering is useful to maximize transition within stable states and minimize transitions 
 between unstable states and in this way it takes kinetics of the system into account. For various
 options available to you, see :ref:`Average` page.
+
+.. _network_generation: 
 
 Network generation
 ------------------
