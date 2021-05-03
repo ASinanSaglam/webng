@@ -31,7 +31,8 @@ you have in the BNG model after running the appropriate WESTPA tools. The result
 be saved in the folder written under :code:`analyses/average/output` (by default it is set
 to :code:`average.png`). The plot will look like a matrix of plots where the diagonal 
 contains 1D probability distributions of each observable and every off-diagonal will be a 
-2D probability heatmap of each pair of observables.
+2D probability heatmap of each pair of observables. For various options available, 
+see :ref:`Average` page.
 
 .. _evolution_analysis: 
 
@@ -39,7 +40,8 @@ Evolution analysis
 ------------------
 
 The analysis :code:`evolution` will make a probability distribution evolution plot for 
-each observable so you can track the progress of your simulation.
+each observable so you can track the progress of your simulation. For various
+options available, see :ref:`Evolution` page.
 
 Clustering and network analyses
 ===============================
@@ -53,7 +55,7 @@ Clustering analysis
 simulation and do `PCCA+ clustering <https://link.springer.com/article/10.1007/s11634-013-0134-6>`_.
 This type of clustering is useful to maximize transition within stable states and minimize transitions 
 between unstable states and in this way it takes kinetics of the system into account. For various
-options available to you, see :ref:`Average` page.
+options available, see :ref:`Cluster` page.
 
 .. _network_generation: 
 
@@ -61,5 +63,5 @@ Network generation
 ------------------
 :code:`network` analysis will use the results of your clustering and give you :code:`gml` files 
 that can be used to visualize the clusters. This analysis will give you two files, one for the 
-full transition matrix and one for the clustered result. For various options available to you, 
-see :ref:`Evolution` page.
+full transition matrix and one for the clustered result. For various options available, see 
+:ref:`Network` page.
