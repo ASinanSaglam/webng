@@ -86,6 +86,9 @@ This is upper level analysis block and has a single option called :code:`enabled
 none of the analyses will run. Each analysis subsection will have the same :code:`enabled` option
 to set if that particular analysis will be ran or not.
 
+Average
+-------
+
 .. code-block:: yaml
    :linenos:
 
@@ -106,4 +109,67 @@ to set if that particular analysis will be ran or not.
       smoothing: 0.5 # the amount of smoothing to apply
       work-path: /home/USER/webng/testing/test/analysis # the folder to run the analysis under
 
-This is the block for :ref:`Average`.
+This is the block for :ref:`Average analysis`.
+
+Evolution
+---------
+
+.. code-block:: yaml
+   :linenos:
+
+   evolution:
+      avg_window: null # number of iterations to average for each point in the plot
+      dimensions: null # you can limit the tool to the first N dimensions
+      enabled: false # this needs to be set to true to run the analysis
+      normalize: false # normalizes the distributions
+      output: evolution.png # output file name 
+      plot-energy: false # plots -ln of probabilies
+      plot-opts: # various plotting options like font sizes and line width
+         name-font-size: 12
+      work-path: /home/USER/webng/testing/test/analysis # the folder to run the analysis under
+
+This is the block for :ref:`Evolution analysis`.
+
+Cluster
+-------
+
+.. code-block:: yaml
+   :linenos:
+
+   cluster:
+      assignments: null
+      cluster-count: 4
+      enabled: true
+      first-iter: null
+      last-iter: null
+      metastable-states-file: null
+      normalize: null
+      states:
+      - coords:
+         - - 20.0
+         - 4.0
+         label: a
+      - coords:
+         - - 4.0
+         - 20.0
+         label: b
+      symmetrize: null
+      transition-matrix: null
+      work-path: /home/boltzmann/webng/stest/test/analysis
+
+This is the block for :ref:`Cluster analysis`.
+
+Network
+-------
+
+.. code-block:: yaml
+   :linenos:
+
+   network:
+      enabled: true
+      metastable-states-file: null
+      pcca-pickle: null
+      state-labels: null
+      work-path: /home/boltzmann/webng/stest/test/analysis
+
+This is the block for :ref:`Network generation`.
