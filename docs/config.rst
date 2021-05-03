@@ -33,7 +33,63 @@ The section that's relevant for the simulation setup should look something like 
       pcoord_length: 10 # Number of data points per WE iteration
       tau: 100 # Resampling frequency
 
-you can change various aspects of the simulation setup in this file.
+you can change various aspects of the simulation setup in this file. 
+
+.. _binning:
+
+Binning
+-------
+
+.. code-block:: yaml
+   :linenos:
+
+   binning_options:
+      block_size: 10 # Number of trajectories to be processed in blocks
+      center_freq: 1 # How frequently do we add new Voronoi centers?
+      max_centers: 300 # Maximum number of Voronoi centers to be added
+      traj_per_bin: 100 # Number of trajectories per Voronoi center
+
+.. _path_options:
+
+Path Options
+------------
+
+.. code-block:: yaml
+   :linenos:
+
+   path_options: # this entire section should be automatically set by the tool
+      WESTPA_path: /home/USER/westpa
+      bng_path: /home/USER/apps/anaconda3/lib/python3.7/site-packages/bionetgen/bng-linux
+      bngl_file: /home/USER/webng/testing/test.bngl
+      sim_name: /home/USER/webng/testing/test # you can adjust sim folder here
+
+.. _propagator_options:
+
+Propagator Options
+------------------
+
+.. code-block:: yaml
+   :linenos:
+
+   propagator_options:
+      pcoords: # These should match observables in your model
+      - Atot
+      - Btot
+      propagator_type: libRoadRunner # this is the suggested propagator
+
+.. _propagator_options:
+
+Sampling Options
+------------------
+
+.. code-block:: yaml
+   :linenos:
+
+   sampling_options:
+      dimensions: 2 # Dimensionality of the WESTPA progress coordinates
+      max_iter: 10 # Maximum number of WE iterations
+      pcoord_length: 10 # Number of data points per WE iteration
+      tau: 100 # Resampling frequency
 
 
 Analysis options
