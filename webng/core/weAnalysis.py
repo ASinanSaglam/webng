@@ -27,6 +27,11 @@ class weAnalysis:
             print("running analyses")
             # we got some analyses to run
             analysis_dict = self.opts["analyses"]
+            if "work-path" in analysis_dict: 
+                work_path = analysis_dict["work-path"]
+            else:
+                work_path = None
+            # 
             if self._getd(analysis_dict, "enabled", default=True):
                 # we should run the analyses we have
                 analysis_list = list(analysis_dict.keys())
@@ -37,6 +42,7 @@ class weAnalysis:
                         # enabled, run
                         avg_dict["pcoords"] = self.opts["propagator_options"]["pcoords"]
                         avg_dict["sim_name"] = self.opts["path_options"]["sim_name"]
+                        avg_dict["work-path"] = work_path
                         weAverage(avg_dict).run()
                 if "evolution" in analysis_list:
                     evo_dict = analysis_dict["evolution"]
@@ -45,6 +51,7 @@ class weAnalysis:
                         # enabled, run
                         evo_dict["pcoords"] = self.opts["propagator_options"]["pcoords"]
                         evo_dict["sim_name"] = self.opts["path_options"]["sim_name"]
+                        evo_dict["work-path"] = work_path
                         weEvolution(evo_dict).run()
                 if "cluster" in analysis_list:
                     clust_dict = analysis_dict["cluster"]
@@ -53,6 +60,7 @@ class weAnalysis:
                         # enabled, run
                         clust_dict["pcoords"] = self.opts["propagator_options"]["pcoords"]
                         clust_dict["sim_name"] = self.opts["path_options"]["sim_name"]
+                        clust_dict["work-path"] = work_path
                         weCluster(clust_dict).run()
                 if "network" in analysis_list:
                     net_dict = analysis_dict["network"]
@@ -64,4 +72,5 @@ class weAnalysis:
                             net_dict["metastable-states-file"] = analysis_dict["cluster"]["metastable-states-file"]
                         net_dict["pcoords"] = self.opts["propagator_options"]["pcoords"]
                         net_dict["sim_name"] = self.opts["path_options"]["sim_name"]
+                        net_dict["work-path"] = work_path
                         weNetwork(net_dict).run()

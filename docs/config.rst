@@ -126,6 +126,7 @@ an analysis section like this
 
    analyses:
       enabled: false
+      work-path: /home/USER/webng/testing/test/analysis # the folder to run the analysis under
       average:
          dimensions: null # you can limit the tool to the first N dimensions
          enabled: false # this needs to be set to true to run the analysis 
@@ -141,7 +142,6 @@ an analysis section like this
             voronoi-lw: 1
          plot-voronoi: false # true if you want to plot voronoi centers
          smoothing: 0.5 # the amount of smoothing to apply
-         work-path: /home/USER/webng/testing/test/analysis # the folder to run the analysis under
       evolution:
          avg_window: null # number of iterations to average for each point in the plot
          dimensions: null # you can limit the tool to the first N dimensions
@@ -151,7 +151,6 @@ an analysis section like this
          plot-energy: false # plots -ln of probabilies
          plot-opts: # various plotting options like font sizes and line width
             name-font-size: 12
-         work-path: /home/USER/webng/testing/test/analysis # the folder to run the analysis under
 
 Let's take a look at individual sections. 
 
@@ -160,10 +159,12 @@ Let's take a look at individual sections.
 
    analyses:
       enabled: false
+      work-path: /home/USER/webng/testing/test/analysis # the folder to run the analysis under
 
 This is upper level analysis block and has a single option called :code:`enabled`. If set to false,
 none of the analyses will run. Each analysis subsection will have the same :code:`enabled` option
-to set if that particular analysis will be ran or not.
+to set if that particular analysis will be ran or not. :code:`work-path` sets the folder to run
+all the analyses under. 
 
 .. _average:
 
@@ -188,9 +189,18 @@ Average
          voronoi-lw: 1
       plot-voronoi: false # true if you want to plot voronoi centers
       smoothing: 0.5 # the amount of smoothing to apply
-      work-path: /home/USER/webng/testing/test/analysis # the folder to run the analysis under
 
-This is the block for :ref:`Average analysis`.
+This is the block for :ref:`Average analysis`. :code:`dimensions` is normally set to null which
+makes the tool plot all dimensions. If this is set to :code:`N` the tool will plot the first 
+:code:`N` dimensions. :code:`first-iter` and :code:`last-iter` are the iterations to start and 
+stop the averaging. :code:`mapper-iter` is the iteration to pull the voronoi mapper from, if you 
+don't want the mapper from the final WE iteration. :code:`normalize` can be used to enable 
+normalization of probability distributions before plotting. :code:`output` is the file name 
+for the output and this can be set to a :code:`png` or :code:`pdf` file. :code:`plot-energy` 
+takes the :code:`-ln` of the probabilities before plotting. :code:`plot-voronoi` controls 
+if the voronoi centers are plotted on top of the probability distributions. :code:`smoothing`
+can be changed to reduce or increase the gaussian smoothing used for probability distributions. 
+:code:`work-path` is the path to the analysis folder. 
 
 .. _evolution:
 
@@ -209,7 +219,6 @@ Evolution
       plot-energy: false # plots -ln of probabilies
       plot-opts: # various plotting options like font sizes and line width
          name-font-size: 12
-      work-path: /home/USER/webng/testing/test/analysis # the folder to run the analysis under
 
 This is the block for :ref:`Evolution analysis`.
 
@@ -240,7 +249,6 @@ Cluster
          label: b
       symmetrize: null
       transition-matrix: null
-      work-path: /home/boltzmann/webng/stest/test/analysis
 
 This is the block for :ref:`Cluster analysis`.
 
@@ -257,6 +265,5 @@ Network
       metastable-states-file: null
       pcca-pickle: null
       state-labels: null
-      work-path: /home/boltzmann/webng/stest/test/analysis
 
 This is the block for :ref:`Network generation`.

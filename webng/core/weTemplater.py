@@ -33,6 +33,7 @@ class weTemplater:
                                  "tau": 100},
             "analyses": {
                 "enabled": False,
+                "work-path": None,
                 "average": {
                     "enabled": False,
                     "mapper-iter": None,
@@ -42,7 +43,6 @@ class weTemplater:
                     "first-iter": None,
                     "last-iter": None,
                     "dimensions": None,
-                    "work-path": None,
                     "output": "average.png",
                     "smoothing": 0.5,
                     "plot-opts": {
@@ -56,7 +56,6 @@ class weTemplater:
                     "plot-energy": False,
                     "normalize": False,
                     "dimensions": None,
-                    "work-path": None,
                     "output": "evolution.png",
                     "avg_window": 1,
                     "plot-opts": {
@@ -65,7 +64,6 @@ class weTemplater:
                 },
                 "cluster": {
                     "enabled": False,
-                    "work-path": None, 
                     "first-iter": None, # default, beginning of sim
                     "last-iter": None, # default, end of sim
                     "transition-matrix": None, # default, make a new one
@@ -85,7 +83,6 @@ class weTemplater:
                 },
                 "network": {
                     "enabled": False,
-                    "work-path": None,
                     "pcca-pickle": None,
                     "metastable-states-file": None,
                     "state-labels": None
@@ -143,12 +140,12 @@ class weTemplater:
         pcoords = self._get_pcoords()
         self.template_dict["propagator_options"]["pcoords"] = pcoords
         self.template_dict["sampling_options"]["dimensions"] = len(pcoords)
-        # update analysis options as well
-        for an_key in self.template_dict["analyses"].keys():
-            if an_key == "enabled":
-                continue
-            self.template_dict["analyses"][an_key]["work-path"] = \
-                os.path.join(self.template_dict["path_options"]["sim_name"], "analysis")
+        # # update analysis options as well
+        # for an_key in self.template_dict["analyses"].keys():
+        #     if an_key == "enabled":
+        #         continue
+        #     self.template_dict["analyses"][an_key]["work-path"] = \
+        #         os.path.join(self.template_dict["path_options"]["sim_name"], "analysis")
 
     def run(self):
         ystr = yaml.dump(self.template_dict)

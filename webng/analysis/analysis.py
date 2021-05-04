@@ -10,9 +10,13 @@ class weAnalysis:
         # keep opts around
         self.opts = opts
         # Set work path
-        self.work_path = self._getd(opts, "work-path", default=os.getcwd(), required=False)
+        self.work_path = self._getd(opts, "work-path", default=None, required=False)
+        if self.work_path is None:
+            self.work_path = os.path.join(self.opts["sim_name"], "analysis")
         # we want to go there
-        assert os.path.isdir(self.work_path), "Work path: {} doesn't exist".format(self.work_path)
+        if not os.path.isdir(self.work_path):
+            os.mkdir(self.work_path)
+        # assert os.path.isdir(self.work_path), "Work path: {} doesn't exist".format(self.work_path)
         self.curr_path = os.getcwd()
         os.chdir(self.work_path)
         # Set names if we have them
