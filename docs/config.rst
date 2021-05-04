@@ -34,6 +34,7 @@ The section that's relevant for the simulation setup should look something like 
       tau: 100 # Resampling frequency
 
 you can change various aspects of the simulation setup in this file. 
+Let's look at each block separately. 
 
 .. _binning:
 
@@ -49,6 +50,12 @@ Binning
       max_centers: 300 # Maximum number of Voronoi centers to be added
       traj_per_bin: 100 # Number of trajectories per Voronoi center
 
+:code:`block_size` refers to how many trajectories will be ran at a time. This is important for
+multicore runs, try to keep the blocksize an integer multiple of the number of cores you have. 
+:code:`center_freq` refers to how frequently voronoi bins will be placed, in units of WE 
+iterations. :code:`max_centers` is the maximum number of voronoi centers that will be placed.
+Finally, :code:`traj_per_bin` is the number of trajectories in each voronoi center. 
+
 .. _path_options:
 
 Path Options
@@ -62,6 +69,11 @@ Path Options
       bng_path: /home/USER/apps/anaconda3/lib/python3.7/site-packages/bionetgen/bng-linux
       bngl_file: /home/USER/webng/testing/test.bngl
       sim_name: /home/USER/webng/testing/test # you can adjust sim folder here
+
+Most of these option should be set automatically if WESTPA and BNG are both python importable. 
+:code:`WESTPA_path` is the path to WESTPA to be used, :code:`bng_path` is the path where BNG2.pl 
+lives. :code:`bngl_file` is the bngl model and :code:`sim_name` is the folder that will be used 
+for the WESTPA setup. 
 
 .. _propagator_options:
 
@@ -77,6 +89,12 @@ Propagator Options
       - Btot
       propagator_type: libRoadRunner # this is the suggested propagator
 
+:code:`pcoords` is the list progress coordinates to be used for WESTPA and should match the 
+observables in your BNGL model. :code:`propagator_type` is the type of propagator to be used. If 
+available, use libRoadRunner since it's currently significantly more efficient for WESTPA runs. 
+If not, you can select "executable" propagator which uses BNG2.pl in combination with bash scripts
+for each walker. 
+
 .. _propagator_options:
 
 Sampling Options
@@ -91,6 +109,11 @@ Sampling Options
       pcoord_length: 10 # Number of data points per WE iteration
       tau: 100 # Resampling frequency
 
+:code:`dimensions` is the number of dimensions to be used for WESTPA progress coordinates and 
+should match the number of BNGL observables you are using. :code:`max_iter` is the maximum number
+of WE iterations to be ran (this can be changed later from within the setup). :code:`pcoord_length`
+is the number of data points each walker will return. :code:`tau` is the length of each BNGL
+simulation/walker. 
 
 Analysis options
 ================
