@@ -14,7 +14,7 @@ class weNetwork(weAnalysis):
         super().__init__(opts)
         # Parse and set the arguments
         # Load PCCA
-        default_pcca = os.path.join(opts["work-path"], "pcca.pkl")
+        default_pcca = os.path.join(self.work_path, "pcca.pkl")
         self.pcca_path = self._getd(opts, "pcca-pickle", default=default_pcca, required=False)
         if self.pcca_path is None:
             self.pcca_path = default_pcca
@@ -27,7 +27,7 @@ class weNetwork(weAnalysis):
         self.full_tm = self.pcca.transition_matrix
         self.coarse_tm = self.pcca.transition_matrix
         # Set mstable file to load 
-        default_mstab = os.path.join(opts["work-path"], "metasble_assignments.pkl")
+        default_mstab = os.path.join(self.work_path, "metasble_assignments.pkl")
         self.mstab_file = self._getd(opts, "metastable-states", default=default_mstab, required=False)
         self.mstabs = self._load_pickle(self.mstab_file)
         # name file 
