@@ -380,7 +380,7 @@ class weConvert:
             '        centers = np.zeros((self.nbins,self.pcoord_ndim),dtype=self.pcoord_dtype)\n',
             '        # Using the values from the inital point\n',
             '        i = np.loadtxt(\'bngl_conf/init.gdat\')\n',
-            '        centers[0] = i[1:]\n',
+            '        centers[0] = i[0,1:]\n',
             '        self.bin_mapper = VoronoiBinMapper(dfunc, centers)\n',
             '        self.bin_target_counts = np.empty((self.bin_mapper.nbins,), np.int)\n',
             '        self.bin_target_counts[...] = {}\n'.format(self.traj_per_bin)
@@ -599,7 +599,12 @@ class weConvert:
         make folders WESTPA needs 
         '''
         self.sim_dir = self.fname
-        os.makedirs(self.fname)
+        try:
+            os.makedirs(self.fname)
+        except FileExistsError as e: 
+            # TODO: make an overwrite option
+            print(f"The folder {self.fname} you are trying to create already exists")
+            print(e)
         os.chdir(self.fname)
         os.makedirs("bngl_conf")
         os.makedirs("bstates")
@@ -635,7 +640,7 @@ class weConvert:
         os.chdir("bngl_conf")
         # make a copy that we will use to generat the XML
         sim = model.setup_simulator()
-        sbml_str = sim.simulator.getCurrentSBML()
+        sbml_str = sim.getCurrentSBML()
         with open("init.xml", "w") as f:
             f.write(str(sbml_str))
         os.chdir(os.path.join(self.main_dir, self.sim_dir))
@@ -649,16 +654,14 @@ class weConvert:
         # b) getting a starting  gdat file
         model = bionetgen.bngmodel(self.bngl_file)
         model.add_action("generate_network", action_args=[("overwrite",1)])
-        model.add_action("simulate", action_args=[("method","ssa"),("t_end",2),("n_steps",2)])
+        model.add_action("simulate", action_args=[("method","'ssa'"),("t_end",2),("n_steps",2)])
         with open("init.bngl", "w") as f:
             f.write(str(model))
-        r = bionetgen.run("init.bngl", "for_init").results["init"]
-        shutil.copyfile("init.net", os.path.join("..","init.net"))
+        r = bionetgen.run("init.bngl", "for_init")
+        shutil.copyfile(os.path.join("for_init","init.net"), "init.net")
         header_str = ""
-        for i in r.dtype.names: header_str += " " + i
-        np.savetxt(os.path.join("..","init.gdat"), [list(r[0])], header=header_str)
-        # move up and remove the useless folder
-        os.chdir("..")
+        for i in r[0].dtype.names: header_str += " " + i
+        np.savetxt("init.gdat", r[0], header=header_str)
         shutil.rmtree("for_init")
         os.chdir(os.path.join(self.main_dir, self.sim_dir))
         return model
