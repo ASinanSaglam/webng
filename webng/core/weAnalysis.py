@@ -1,16 +1,18 @@
-import sys,yaml
+import sys, yaml
 from webng.analysis import weAverage, weEvolution, weCluster, weNetwork
+
 
 class weAnalysis:
     """
-    This is the core analysis class that will be used by the command line 
-    tool when called with the subcommand `webng analysis`. 
+    This is the core analysis class that will be used by the command line
+    tool when called with the subcommand `webng analysis`.
 
     The class needs the analysis dictionary from the configuration file
     for initialization and when you use the `run` method it will go through
     the dictionary, calling the appropriate analysis tools with the subdictionaries
-    of each, in the appropriate order. 
+    of each, in the appropriate order.
     """
+
     def __init__(self, args) -> None:
         with open(args.opts, "r") as f:
             opt_dict = yaml.load(f)
@@ -27,11 +29,11 @@ class weAnalysis:
             print("running analyses")
             # we got some analyses to run
             analysis_dict = self.opts["analyses"]
-            if "work-path" in analysis_dict: 
+            if "work-path" in analysis_dict:
                 work_path = analysis_dict["work-path"]
             else:
                 work_path = None
-            # 
+            #
             if self._getd(analysis_dict, "enabled", default=True):
                 # we should run the analyses we have
                 analysis_list = list(analysis_dict.keys())
@@ -58,7 +60,9 @@ class weAnalysis:
                     if self._getd(clust_dict, "enabled", default=True):
                         print("running analysis: cluster")
                         # enabled, run
-                        clust_dict["pcoords"] = self.opts["propagator_options"]["pcoords"]
+                        clust_dict["pcoords"] = self.opts["propagator_options"][
+                            "pcoords"
+                        ]
                         clust_dict["sim_name"] = self.opts["path_options"]["sim_name"]
                         clust_dict["work-path"] = work_path
                         weCluster(clust_dict).run()
@@ -68,8 +72,12 @@ class weAnalysis:
                         print("running analysis: network")
                         # enabled, run
                         if "cluster" in analysis_dict:
-                            net_dict["assignments"] = analysis_dict["cluster"]["assignments"]
-                            net_dict["metastable-states-file"] = analysis_dict["cluster"]["metastable-states-file"]
+                            net_dict["assignments"] = analysis_dict["cluster"][
+                                "assignments"
+                            ]
+                            net_dict["metastable-states-file"] = analysis_dict[
+                                "cluster"
+                            ]["metastable-states-file"]
                         net_dict["pcoords"] = self.opts["propagator_options"]["pcoords"]
                         net_dict["sim_name"] = self.opts["path_options"]["sim_name"]
                         net_dict["work-path"] = work_path

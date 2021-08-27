@@ -1,36 +1,43 @@
 import westpa, bionetgen, yaml, os, platform
 
+
 class weTemplater:
     """
-    This is the class that will be used by the command line tool when it's 
+    This is the class that will be used by the command line tool when it's
     called with the subcommand `webng template`.
 
     The class needs and object containing input/output attributes (usually a
-    argparser object) for initialization. 
+    argparser object) for initialization.
 
-    The `run` method will write a template webng config file using the given 
+    The `run` method will write a template webng config file using the given
     options as well as paths acquired from imported libraries.
     """
+
     def __init__(self, args):
         # get arguments
         self.inp_file = args.input
         self.out_file = args.output
         # setup a template dictionary
         self.template_dict = {
-            "propagator_options": { "propagator_type": "libRoadRunner",
-                                    "pcoords": None},
-            "binning_options":  {"block_size": 10, 
-                                 "center_freq": 1, 
-                                 "max_centers": 300, 
-                                 "traj_per_bin": 100},
-            "path_options":     {"WESTPA_path": None, 
-                                 "bng_path": None,
-                                 "bngl_file": None, 
-                                 "sim_name": None},
-            "sampling_options": {"dimensions": None, 
-                                 "max_iter": 10, 
-                                 "pcoord_length": 10, 
-                                 "tau": 100},
+            "propagator_options": {"propagator_type": "libRoadRunner", "pcoords": None},
+            "binning_options": {
+                "block_size": 10,
+                "center_freq": 1,
+                "max_centers": 300,
+                "traj_per_bin": 100,
+            },
+            "path_options": {
+                "WESTPA_path": None,
+                "bng_path": None,
+                "bngl_file": None,
+                "sim_name": None,
+            },
+            "sampling_options": {
+                "dimensions": None,
+                "max_iter": 10,
+                "pcoord_length": 10,
+                "tau": 100,
+            },
             "analyses": {
                 "enabled": False,
                 "work-path": None,
@@ -48,8 +55,8 @@ class weTemplater:
                     "plot-opts": {
                         "name-font-size": 12,
                         "voronoi-lw": 1,
-                        "voronoi-col": 0.75
-                    }
+                        "voronoi-col": 0.75,
+                    },
                 },
                 "evolution": {
                     "enabled": False,
@@ -60,34 +67,30 @@ class weTemplater:
                     "avg_window": 1,
                     "plot-opts": {
                         "name-font-size": 12,
-                    }
+                    },
                 },
                 "cluster": {
                     "enabled": False,
-                    "first-iter": None, # default, beginning of sim
-                    "last-iter": None, # default, end of sim
-                    "transition-matrix": None, # default, make a new one
-                    "assignments": None, # default, make a new one
-                    "metastable-states-file": None, # default, metasble_assignments.pkl
-                    "cluster-count": 2, # default, 2, require the cluster count
-                    "normalize": None, # default false
-                    "symmetrize": None, # default true
-                    "states": [{
-                        "label": "a",
-                        "coords": [[20.0,4.0]]
-                    },
-                    {
-                        "label": "b",
-                        "coords": [[4.0,20.0]]
-                    }]
+                    "first-iter": None,  # default, beginning of sim
+                    "last-iter": None,  # default, end of sim
+                    "transition-matrix": None,  # default, make a new one
+                    "assignments": None,  # default, make a new one
+                    "metastable-states-file": None,  # default, metasble_assignments.pkl
+                    "cluster-count": 2,  # default, 2, require the cluster count
+                    "normalize": None,  # default false
+                    "symmetrize": None,  # default true
+                    "states": [
+                        {"label": "a", "coords": [[20.0, 4.0]]},
+                        {"label": "b", "coords": [[4.0, 20.0]]},
+                    ],
                 },
                 "network": {
                     "enabled": False,
                     "pcca-pickle": None,
                     "metastable-states-file": None,
-                    "state-labels": None
-                }
-            }
+                    "state-labels": None,
+                },
+            },
         }
         # adjust dictionary
         self._adjust_template()
@@ -104,7 +107,7 @@ class weTemplater:
     def _get_bng_path(self):
         # now we need the BNG path, get it from the library as well
         # we need the platform and the appropriate folder name
-        system = platform.system() 
+        system = platform.system()
         if system == "Linux":
             bng_name = "bng-linux"
         elif system == "Windows":
@@ -135,7 +138,9 @@ class weTemplater:
         # output folder
         model_file = os.path.split(self.inp_file)[1]
         model_name = os.path.splitext(model_file)[0]
-        self.template_dict["path_options"]["sim_name"] = os.path.join(os.getcwd(), model_name)
+        self.template_dict["path_options"]["sim_name"] = os.path.join(
+            os.getcwd(), model_name
+        )
         # set propagator options, in particular get observable names
         pcoords = self._get_pcoords()
         self.template_dict["propagator_options"]["pcoords"] = pcoords
