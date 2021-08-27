@@ -15,7 +15,8 @@ After that is installed, you can install webng directly from PyPI using pip
     pip install webng
 
 which will also install WESTPA and BioNetGen python libraries which means you only need to 
-run this command and have your model to run a WESTPA simulation. 
+run this command and have your model to run a WESTPA simulation. Please note that Windows 
+is not currently supported. 
 
 Usage
 =====
