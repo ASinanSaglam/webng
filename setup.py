@@ -2,6 +2,13 @@
 from setuptools import setup, find_packages
 from webng.core.version import get_version
 
+# handle WESTPA version here for now
+import subprocess, sys
+subprocess.check_call([sys.executable, "-m", "pip", "install",
+    "git+https://github.com/westpa/westpa.git@955aa1205fa42b2a675ac0abec6b7034efcbd1a5"])
+
+
+
 VERSION = get_version()
 
 f = open('README.md', 'r')

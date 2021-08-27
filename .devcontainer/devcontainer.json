@@ -1,0 +1,5 @@
+{
+    "name": "webng",
+	"dockerFile": "..\\Dockerfile",
+	"context": "..",
+}
