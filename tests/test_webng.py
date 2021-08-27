@@ -57,10 +57,18 @@ def test_setup():
     with weBNGTest(argv=argv) as app:
         app.run()
         assert os.path.isdir(opath)
-    # clean up
-    os.remove(fpath)
-    shutil.rmtree(opath)
 
+def test_simrun():
+    fpath = os.path.join(tfold, "test")
+    os.chdir(fpath)
+    import subprocess
+    rc = subprocess.run(["./init.sh"])
+    assert rc.returncode == 0
+    rc = subprocess.run(["w_run", "--serial"])
+    assert rc.returncode == 0
+    # clean up 
+    os.remove(os.path.join(tfold, "test_setup.yaml"))
+    shutil.rmtree(os.path.join(tfold, "test"))
 
 # TODO: Write tests for each analysis 
 
