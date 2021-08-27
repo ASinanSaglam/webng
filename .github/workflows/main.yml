@@ -9,15 +9,18 @@ on:
 
 jobs:
   deploy:
-
-    runs-on: ubuntu-latest
-
+    runs-on: ${{ matrix.os }}
+      strategy:
+        fail-fast: false
+        matrix:
+          os: [ubuntu-latest, windows-latest, macos-latest]
+          python-version: [3.7, 3.8, 3.9]
     steps:
     - uses: actions/checkout@v2
-    - name: Set up Python
+    - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
       with:
-        python-version: '3.7'
+        python-version: ${{ matrix.python-version }}
     - name: Cache pip
       uses: actions/cache@v2
       with:
@@ -37,7 +40,7 @@ jobs:
         python setup.py sdist bdist_wheel
     - name: Test with PyTest
       run: |
-        pytest
+        pytest -s
 #   - name: Publish
 #     env:
 #       TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}

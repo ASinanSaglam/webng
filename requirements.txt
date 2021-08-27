@@ -6,4 +6,5 @@ seaborn
 h5py
 pygpcca
 bionetgen>=0.4.3
+libroadrunner
 networkx

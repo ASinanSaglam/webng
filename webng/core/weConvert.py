@@ -638,7 +638,7 @@ class weConvert:
         # But we also need to generate the XML file
         # get in the conf folder
         os.chdir("bngl_conf")
-        # make a copy that we will use to generat the XML
+        # make a copy that we will use to generate the XML
         sim = model.setup_simulator()
         sbml_str = sim.getCurrentSBML()
         with open("init.xml", "w") as f:
