@@ -10,7 +10,7 @@ subprocess.check_call(
         "-m",
         "pip",
         "install",
-        "git+https://github.com/westpa/westpa.git@955aa1205fa42b2a675ac0abec6b7034efcbd1a5",
+        "git+https://github.com/westpa/westpa.git@d9da04365ff645547fce9666e3483e2830550abd",
     ]
 )
 
