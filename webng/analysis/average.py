@@ -198,7 +198,7 @@ class weAverage(weAnalysis):
             if fi == fj:
                 # Set equal widht height
                 if self.normalize:
-                    axarr[ii, jj].set(adjustable="box-forced", aspect="equal")
+                    axarr[ii, jj].set(adjustable="box", aspect="equal")
                 # plotting the diagonal, 1D plots
                 if fi != self.dims:
                     # First pull a file that contains the dimension
@@ -244,7 +244,7 @@ class weAverage(weAnalysis):
             else:
                 # Set equal widht height
                 if self.normalize:
-                    axarr[ii, jj].set(adjustable="box-forced", aspect="equal")
+                    axarr[ii, jj].set(adjustable="box", aspect="equal")
                 # Plotting off-diagonal, plotting 2D heatmaps
                 if fi < fj:
                     datFile = self.open_pdist_file(fi, fj)

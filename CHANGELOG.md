@@ -16,3 +16,6 @@ Updating the exact version of WESTPA installed
 
 ## 0.0.5
 PyBNG API changes to action arguments
+
+## 0.0.6
+Matplotlib removed box-forced, going to box instead. Default iterations up to 100. 

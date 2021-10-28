@@ -321,7 +321,7 @@ class WEPCAer:
                     # figure out the fig indices
                     fi, fj = ctr / c, ctr % c
                     ctr += 1
-                    axarr[fi, fj].set(adjustable="box-forced")
+                    axarr[fi, fj].set(adjustable="box")
                     axarr[fi, fj].set_title(
                         "{} vs {}".format(i, j),
                         fontdict={"fontsize": 6, "verticalalignment": "top"},
