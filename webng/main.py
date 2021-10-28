@@ -67,7 +67,7 @@ class weBNGBase(cement.Controller):
                 {
                     "help": "The bngl model to write the template for."
                     + 'If not model name is given, a template for "model.bngl" will be written',
-                    "default": "model.bngl",
+                    "default": None,
                     "type": str,
                     "required": False,
                 },

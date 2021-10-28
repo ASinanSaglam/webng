@@ -15,7 +15,63 @@ class weTemplater:
 
     def __init__(self, args):
         # get arguments
-        self.inp_file = args.input
+        if args.input is None:
+            # let's write a sample model file
+            with open("exmisa.bngl", "w") as f:
+                f.write(
+                    "begin model\n"
+                    + "begin parameters\n"
+                    + "    g0 4.0\n"
+                    + "    g1 18.0\n"
+                    + "    k 1.0\n"
+                    + "    ha 1E-5\n"
+                    + "    hr 1E-1\n"
+                    + "    fa 1E-5\n"
+                    + "    fr 1.0\n"
+                    + "end parameters\n"
+                    + "begin molecule types\n"
+                    + "    A()\n"
+                    + "    B()\n"
+                    + "    GeneA_00()\n"
+                    + "    GeneA_01()\n"
+                    + "    GeneA_10()\n"
+                    + "    GeneB_00()\n"
+                    + "    GeneB_01()\n"
+                    + "    GeneB_10()\n"
+                    + "end molecule types\n"
+                    + "begin species #initial molecule count\n"
+                    + "    GeneA_00() 1\n"
+                    + "    GeneA_01() 0\n"
+                    + "    GeneA_10() 0\n"
+                    + "    GeneB_00() 1\n"
+                    + "    GeneB_01() 0\n"
+                    + "    GeneB_10() 0\n"
+                    + "    A() 4\n"
+                    + "    B() 18\n"
+                    + "end species\n"
+                    + "begin observables\n"
+                    + "    Molecules Atot A()\n"
+                    + "    Molecules Btot B()\n"
+                    + "end observables\n"
+                    + "begin reaction rules\n"
+                    + "    GeneA_00() + A() + A() <-> GeneA_10() ha, fa\n"
+                    + "    GeneA_00() + B() + B() <-> GeneA_01() hr, fr\n"
+                    + "    GeneA_00() -> GeneA_00() + A() g0\n"
+                    + "    GeneA_01() -> GeneA_01() + A() g0\n"
+                    + "    GeneA_10() -> GeneA_10() + A() g1\n"
+                    + "    GeneB_00() + A() + A() <-> GeneB_01() hr, fr\n"
+                    + "    GeneB_00() + B() + B() <-> GeneB_10() ha, fa\n"
+                    + "    GeneB_00() -> GeneB_00() + B() g0\n"
+                    + "    GeneB_01() -> GeneB_01() + B() g0\n"
+                    + "    GeneB_10() -> GeneB_10() + B() g1\n"
+                    + "    A() -> 0 k\n"
+                    + "    B() -> 0 k\n"
+                    + "end reaction rules\n"
+                    + "end model\n"
+                )
+                self.inp_file = "exmisa.bngl"
+        else:
+            self.inp_file = args.input
         self.out_file = args.output
         # setup a template dictionary
         self.template_dict = {

@@ -55,10 +55,11 @@ def test_setup():
     opath = os.path.join(tfold, "test")
     # adjust iteration count
     import yaml
-    with open(fpath, 'r') as f:
+
+    with open(fpath, "r") as f:
         opts_yaml = yaml.load(f)
-    opts_yaml['sampling_options']['max_iter'] = 5
-    with open(fpath, 'w') as f:
+    opts_yaml["sampling_options"]["max_iter"] = 5
+    with open(fpath, "w") as f:
         yaml.dump(opts_yaml, f)
     argv = ["setup", "--opts", "{}".format(fpath)]
     with weBNGTest(argv=argv) as app:
