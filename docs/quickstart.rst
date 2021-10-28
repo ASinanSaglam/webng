@@ -18,6 +18,31 @@ which will also install WESTPA and BioNetGen python libraries which means you on
 run this command and have your model to run a WESTPA simulation. Please note that Windows 
 is not currently supported. 
 
+Common installation issues
+**************************
+
+If you are using WsL, you will need libncurses5, you can install it with 
+
+.. code-block:: shell
+
+   sudo apt-get install libncurses5
+
+If the webng dependencies don't automatically install, you can clone the webng repository with 
+
+.. code-block:: shell
+
+   git clone https://github.com/ASinanSaglam/webng.git
+
+and install the repo locally with 
+
+.. code-block:: shell
+
+   cd webng
+   pip install -r requirements.txt
+   pip install -e .
+   
+which should install everything you need. 
+
 Usage
 =====
 

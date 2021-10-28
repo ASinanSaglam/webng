@@ -34,7 +34,7 @@ class weTemplater:
             },
             "sampling_options": {
                 "dimensions": None,
-                "max_iter": 10,
+                "max_iter": 100,
                 "pcoord_length": 10,
                 "tau": 100,
             },
