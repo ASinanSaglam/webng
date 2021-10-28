@@ -19,3 +19,6 @@ PyBNG API changes to action arguments
 
 ## 0.0.6
 Matplotlib removed box-forced, going to box instead. Default iterations up to 100. 
+
+## 0.0.7
+The template subcommand will now use ExMISA model as a default input if an input file is not given. 
