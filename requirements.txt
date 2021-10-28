@@ -1,6 +1,6 @@
 numpy
 cement
-pyyaml
+pyyaml==5.4.1
 colorlog
 seaborn
 h5py

@@ -1,6 +1,5 @@
 import yaml, os, shutil, sys, bionetgen
 import numpy as np
-import subprocess as sbpc
 
 # TODO: Expose more functionality to the options file
 # especially some of them can be optionally exposed
