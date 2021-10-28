@@ -13,3 +13,6 @@ Removing WESTPA dependency until WESTPA2.0 is on PyPI fully. For now we are inst
 
 ## 0.0.4
 Updating the exact version of WESTPA installed
+
+## 0.0.5
+PyBNG API changes to action arguments
