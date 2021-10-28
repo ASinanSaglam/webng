@@ -665,9 +665,9 @@ class weConvert:
         # Make specific BNGL files for a) generating network and then
         # b) getting a starting  gdat file
         model = bionetgen.bngmodel(self.bngl_file)
-        model.add_action("generate_network", action_args=[("overwrite", 1)])
+        model.add_action("generate_network", action_args={"overwrite": 1})
         model.add_action(
-            "simulate", action_args=[("method", "'ssa'"), ("t_end", 2), ("n_steps", 2)]
+            "simulate", action_args={"method": "'ssa'", "t_end": 2, "n_steps": 2}
         )
         with open("init.bngl", "w") as f:
             f.write(str(model))
