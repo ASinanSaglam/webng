@@ -1,0 +1,8 @@
+[build-system]
+build-backend = 'setuptools.build_meta:__legacy__'
+# Minium 
+
+requires = [
+ 'setuptools>=38.6.0',
+ 'cement',
+]
