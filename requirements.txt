@@ -1,10 +1,10 @@
 numpy
 cement
-pyyaml==5.4.1
+pyyaml
 colorlog
 seaborn
 h5py
 pygpcca
-bionetgen>=0.4.3
+bionetgen>=0.7.5
 libroadrunner
 networkx
