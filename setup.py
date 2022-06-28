@@ -1,8 +1,6 @@
 from setuptools import setup, find_packages
 from webng.core.version import get_version
 
-
-
 VERSION = get_version()
 
 f = open("README.md", "r")
@@ -23,11 +21,9 @@ INSTALL_REQUIRES = [
     "westpa==2.0dev1"
 ]
 
-
 EXTRAS_REQUIRE = {
     "dev" : ['pytest', 'twine>=1.11.0', 'wheel>=0.31.0']
 }
-
 
 setup(
     name="webng",
