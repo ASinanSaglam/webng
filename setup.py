@@ -1,6 +1,20 @@
 from setuptools import setup, find_packages
 from webng.core.version import get_version
 
+# handle WESTPA version here for now
+import subprocess, sys
+
+subprocess.check_call(
+    [
+        sys.executable,
+        "-m",
+        "pip",
+        "install",
+        "git+https://github.com/westpa/westpa.git@d9da04365ff645547fce9666e3483e2830550abd",
+    ]
+)
+
+
 VERSION = get_version()
 
 f = open("README.md", "r")
@@ -18,7 +32,6 @@ INSTALL_REQUIRES = [
     "bionetgen>=0.7.5",
     "libroadrunner",
     "networkx",
-    "westpa==2.0dev1"
 ]
 
 EXTRAS_REQUIRE = {
