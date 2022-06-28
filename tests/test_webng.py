@@ -55,9 +55,15 @@ def test_setup():
     opath = os.path.join(tfold, "test")
     # adjust iteration count
     import yaml
+        
+    from yaml import load, dump
+    try:
+        from yaml import CLoader as Loader, CDumper as Dumper
+    except ImportError:
+        from yaml import Loader, Dumper
 
     with open(fpath, "r") as f:
-        opts_yaml = yaml.load(f)
+        opts_yaml = yaml.load(f, Loader=Loader)
     opts_yaml["sampling_options"]["max_iter"] = 5
     with open(fpath, "w") as f:
         yaml.dump(opts_yaml, f)
