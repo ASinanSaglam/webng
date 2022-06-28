@@ -1,10 +1,1 @@
-numpy
-cement
-pyyaml
-colorlog
-seaborn
-h5py
-pygpcca
-bionetgen>=0.7.5
-libroadrunner
-networkx
+.

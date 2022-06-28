@@ -21,6 +21,25 @@ f = open("README.md", "r")
 LONG_DESCRIPTION = f.read()
 f.close()
 
+INSTALL_REQUIRES = [
+    "numpy",
+    "cement",
+    "pyyaml",
+    "colorlog",
+    "seaborn",
+    "h5py",
+    "pygpcca",
+    "bionetgen>=0.7.5",
+    "libroadrunner",
+    "networkx",
+]
+
+
+EXTRAS_REQUIRE = {
+    "dev" : ['pytest', 'twine>=1.11.0', 'setuptools>=38.6.0', 'wheel>=0.31.0']
+}
+
+
 setup(
     name="webng",
     version=VERSION,
@@ -34,6 +53,8 @@ setup(
     packages=find_packages(exclude=["ez_setup", "tests*"]),
     package_data={"webng": ["templates/*"]},
     include_package_data=True,
+    install_requires=INSTALL_REQUIRES,
+    extras_require=EXTRAS_REQUIRE,
     entry_points="""
         [console_scripts]
         webng = webng.main:main
