@@ -52,6 +52,8 @@ class weAverage(weAnalysis):
         self.data_smoothing_level = opts["smoothing"]
         # data normalization to min/max
         self.normalize = opts["normalize"]
+        # get color bar option
+        self.color_bar = opts["color_bar"]
 
     def get_mapper(self, mapper_iter):
         # Gotta fix this behavior
@@ -100,7 +102,7 @@ class weAverage(weAnalysis):
         plt.figure(figsize=(1.5, 1.5))
         f, axarr = plt.subplots(self.dims, self.dims)
         f.subplots_adjust(
-            hspace=0.4, wspace=0.4, bottom=0.05, left=0.05, top=0.98, right=0.98
+            hspace=0.4, wspace=0.4, bottom=0.05, left=0.05, top=0.98, right=0.9
         )
         return f, axarr
 
@@ -306,6 +308,13 @@ class weAverage(weAnalysis):
                 pcolormesh = axarr[ii, jj].pcolormesh(
                     x_bins, y_bins, e_dist, cmap=cmap, vmin=1e-10
                 )
+
+                if self.color_bar:
+                    f.colorbar(
+                        pcolormesh,
+                        ax=axarr[ii, jj],
+                        label="probability"
+                    )
 
                 # Plot vornoi bins if asked
                 if self.voronoi:

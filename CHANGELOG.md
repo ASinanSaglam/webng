@@ -22,3 +22,6 @@ Matplotlib removed box-forced, going to box instead. Default iterations up to 10
 
 ## 0.0.7
 The template subcommand will now use ExMISA model as a default input if an input file is not given. 
+
+## 0.0.8
+Colorlog option is now parsed. PyYaml loading adjusted for new version of PyYaml.

@@ -1,3 +1,9 @@
+from yaml import load, dump
+try:
+    from yaml import CLoader as Loader, CDumper as Dumper
+except ImportError:
+    from yaml import Loader, Dumper
+
 import yaml, os, shutil, sys, bionetgen
 import numpy as np
 
@@ -72,7 +78,7 @@ class weConvert:
         yaml library
         """
         with open(yfile, "r") as f:
-            y = yaml.load(f)
+            y = yaml.load(f, Loader=Loader)
         return y
 
     def _write_librrPropagator(self):

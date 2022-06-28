@@ -46,6 +46,8 @@ class weEvolution(weAnalysis):
         self.avg_window = self._getd(opts, "avg_window", default=10, required=False)
         # set last iter
         self.last_iter = self.h5file.attrs["west_current_iteration"] - 1
+        # color bar
+        self.color_bar = self._getd(opts, "color_bar", default=False, required=False)
 
     def set_dims(self, dims=None):
         if dims is None:
@@ -203,6 +205,14 @@ class weEvolution(weAnalysis):
                 cmap=cmap,
                 vmin=1e-60,
             )
+
+            if self.color_bar:
+                    f.colorbar(
+                        pcolormesh,
+                        ax=axarr[ii, jj],
+                        label="probability"
+                    )
+
         plt.tight_layout()
         self.save_fig()
         return
