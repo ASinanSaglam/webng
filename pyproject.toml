@@ -6,4 +6,5 @@ requires = [
  'setuptools>=38.6.0',
  'cement',
  'pip',
+ 'wheel',
 ]
