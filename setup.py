@@ -34,11 +34,9 @@ INSTALL_REQUIRES = [
     "networkx",
 ]
 
-
 EXTRAS_REQUIRE = {
-    "dev" : ['pytest', 'twine>=1.11.0', 'setuptools>=38.6.0', 'wheel>=0.31.0']
+    "dev" : ['pytest', 'twine>=1.11.0', 'wheel>=0.31.0']
 }
-
 
 setup(
     name="webng",
