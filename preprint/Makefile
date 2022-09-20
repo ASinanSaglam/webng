@@ -1,11 +1,12 @@
 BUILD_DIR=build
-MAIN_FILE=main_old.md
+# MAIN_FILE=main_old.md
+MAIN_FILE=main.md
 
 all: paper
 
 paper:
 	mkdir -p $(BUILD_DIR)
-	cp -r ./*.md bibliography/* template/* images/* $(BUILD_DIR)
+	cp -r ./*.md bibliography/* images/* $(BUILD_DIR)
 	cd $(BUILD_DIR) && pandoc --standalone --citeproc \
 	-f markdown+yaml_metadata_block+tex_math_dollars+raw_tex \
 	--filter panflute -o main.tex $(MAIN_FILE)
