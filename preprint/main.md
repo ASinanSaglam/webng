@@ -12,7 +12,7 @@ metadata:
   - Ali Sinan Saglam
   - James R. Faeder
 abstract: |
-  WEBNG is a tool to simplify WESTPA simulations of BNGL models.
+  WEBNG is an open-source templating tool to simplify weighted ensemble simulations of rule-based models. WEBNG bridges the open source software packages WESTPA, for weighted ensemble path sampling, and BioNetGen, for rule-based modeeling. This package is designed to simplify enhanced rare-event sampling of biological rule-based models, allowing researchers to tackle more challenging models that contain harder to simulate processes within a well-defined framework. Depending on existing open-source packages that are proven and are in active development allows WEBNG to stay up-to-date while also being easy to install and maintain. 
 ...
 
 
