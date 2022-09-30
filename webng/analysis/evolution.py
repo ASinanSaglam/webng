@@ -48,6 +48,8 @@ class weEvolution(weAnalysis):
         self.last_iter = self.h5file.attrs["west_current_iteration"] - 1
         # color bar
         self.color_bar = self._getd(opts, "color_bar", default=False, required=False)
+        # normalize
+        self.normalize = self._getd(opts, "normalize", default=False, required=False)
 
     def set_dims(self, dims=None):
         if dims is None:
@@ -188,11 +190,13 @@ class weEvolution(weAnalysis):
 
             # Calculate the x values, normalize s.t. it spans 0-1
             x_bins = datFile["binbounds_0"][...]
-            x_max = x_bins.max()
-            x_bins = x_bins / x_max
+            if self.normalize:
+                x_max = x_bins.max()
+                x_bins = x_bins / x_max
 
             # Plot on the correct ax, set x limit
-            axarr[ii, jj].set_ylim(0.0, 1.0)
+            if self.normalize:
+                axarr[ii, jj].set_ylim(0.0, 1.0)
             cmap = mpl.cm.magma_r
             cmap.set_bad(color="white")
             cmap.set_over(color="white")
