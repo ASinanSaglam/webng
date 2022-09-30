@@ -53,7 +53,10 @@ class weAverage(weAnalysis):
         # data normalization to min/max
         self.normalize = opts["normalize"]
         # get color bar option
-        self.color_bar = opts["color_bar"]
+        if "color_bar" in opts:
+            self.color_bar = opts["color_bar"]
+        else:
+            self.color_bar = None
 
     def get_mapper(self, mapper_iter):
         # Gotta fix this behavior

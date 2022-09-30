@@ -25,3 +25,6 @@ The template subcommand will now use ExMISA model as a default input if an input
 
 ## 0.0.8
 Colorlog option is now parsed. PyYaml loading adjusted for new version of PyYaml.
+
+## 0.0.9
+Various bug fixes with PyYAML and color bar options.

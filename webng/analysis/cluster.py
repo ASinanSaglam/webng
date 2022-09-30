@@ -45,6 +45,7 @@ class weCluster(weAnalysis):
         )
         # Cluster count
         self.cluster_count = self._getd(opts, "cluster-count")
+        self.max_cluster_count = self._getd(opts, "max-cluster-count")
         # Do we symmetrize
         self.symmetrize = self._getd(opts, "symmetrize", default=True, required=False)
         # normalize data so results are in %s
@@ -188,9 +189,13 @@ class weCluster(weAnalysis):
         print("##### Clustering #####")
         self.preprocess_tm()
         dims = self.tm.shape[0]
+        print("##### PCCA setup #####")
         self.pcca = pgp.GPCCA(self.tm, z="LM", method="brandts")
-        print(self.pcca.minChi(self.cluster_count, dims))
-        self.pcca.optimize({"m_min": self.cluster_count, "m_max": dims})
+        max_clusters = min(self.max_cluster_count, dims)
+        print(self.pcca.minChi(self.cluster_count, max_clusters))
+        print(f"##### Optimizing for {self.cluster_count} clusters #####")
+        self.pcca.optimize({"m_min": self.cluster_count, "m_max": max_clusters})
+        print(f"##### Calculating clustered properties #####")
         self.p = self.pcca.coarse_grained_stationary_probability
         self.ctm = self.pcca.coarse_grained_transition_matrix
         self.assignments = []

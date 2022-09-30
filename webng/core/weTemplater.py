@@ -133,6 +133,7 @@ class weTemplater:
                     "assignments": None,  # default, make a new one
                     "metastable-states-file": None,  # default, metasble_assignments.pkl
                     "cluster-count": 2,  # default, 2, require the cluster count
+                    "max-cluster-count": 10, # default 10, we need a maximum value
                     "normalize": None,  # default false
                     "symmetrize": None,  # default true
                     "states": [
