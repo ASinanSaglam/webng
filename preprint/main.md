@@ -50,7 +50,7 @@ Simple installation
 -------------------
 To lower the barrier to entry for this sampling method, we distirbute WEBNG via the python package index. This simplifies the installation to a single command from the command line. This also installs a specific version of WESTPA that WEBNG is designed to work with as well as PyBioNetGen (link). This not only allows the user to avoid having to install the other two packages separately but also allows WEBNG to know where the packages are located automatically so no user input is needed as to where they are installed.
 
-![General workflow for WEBNG](webng_flow.png)
+![General workflow for WEBNG](fig1.png)
 
 Default templates to smoothen the learning curve for WE sampling (? bad but I'm unsure what else to write)
 ----------------------------------------------------------------------------------------------------------
@@ -66,9 +66,16 @@ Once the simulation is ran, the user can use the `analysis` subcommand, which al
 
 Example published system
 -----------------------
-While designing WEBNG we used Tse et al. as a reference, aiming to be able to reproduce the results, quickly setup our simulation for the systems used in the paper and replicate some of the analyses done in a streamlined fashion. Tse et al. uses weighted ensemble to run stochastic simulations of multiple gene regulatory network models and uses the results to identify different phenotypes of the model and estimate rate constants (or mean first passage times) between those phenotypes. We have replicated the results of the simplest model in studied in Tse et al. as an example and the analyses ran on a model of two gene network motif that is common in cell-fate branch points are shown in Fig1.
+While designing WEBNG we used Tse et al. as a reference, aiming to be able to reproduce the results, quickly setup our simulation for the systems used in the paper and replicate some of the analyses done in a streamlined fashion. Tse et al. uses weighted ensemble to run stochastic simulations of multiple gene regulatory network models, identifies different phenotypes of the model and estimates mean first passage times between those phenotypes. 
 
-![Results of automated analyses on a simulation of X, replicated from Tse et al. study (A) Probability distribution of each progress coordinate over WE iterations. Each distribution is calculated off of a running average over Y iterations. Lighter colors show less probable regions while darker colors show more probable regions. (B) 2D heatmaps of joint probabilty distributions of each progress coordinate against each other progress coordinate. Lighter colors show less probable regions while darker colors show more probable regions. The probabilty distributions are estimated over Z WE iterations.(C) Transition probabilities and rate constants between four clusters defined using PCCA clustering algorithm. Transitions between clusters HH and LL are rare events and the error bars show that the rate constants are well converted. (D) Network graph generated off of the clustering done in the previous clustering step. Thicker vertices mean higher probability (and therefore rate constant) transitions and node sizes scale with the probability of each state in steady state.](fig2.png)
+ExMISA model
+------------
+
+We have replicated the results of a two gene network motif that was studied in Tse et al. as an example and the results from the built-in analyses provided with WEBNG are shown in Fig1. This is a model of exclusive mutual inhibition and self-activation where there are two genes, generically named A and B, that encode transcription factors that activate their own transcription and repress the transcription of the other gene (Fig1A). The model includes the creation and degradation of the transcription factors as well as binding and unbinding of these transcriptions factors to the regulatory regions of both genes. 
+
+The analysis reveals 4 expected high probability regions (Fig1B), one region where both proteins are low in count (same notation as Tse et al., protein A count/protein B count, lo/lo), one where both proteins are high in count (hi/hi) and two regions where one protein is low and the other is high in count (hi/lo and lo/hi). The automated clustering correctly identifies each cluster correctly (Fig1C) and automated network visualization can visualize each state and transitions between them (Fig1D). 
+
+![Results of automated analyses on a simulation of ExMISA that was ran for 500 WE iterations, replicated from Tse et al. study (A) Diagram of the ExMISA model (B) 2D heatmaps of joint probabilty distributions of protein A versus protein B counts. Lighter colors show less probable regions while darker colors show more probable regions. The probabilty distributions are estimated over the last 100 WE iterations. The grey lines indicate voronoi bins used in adaptive binning. (C) Automated clustering correctly identifies each high probability phenotype. Clusters are represented by colored dots overlayed on top of a 2D heatmap of joint probability distribution of protein A counts versus protein B counts. Each colored dot represents one discrete possible state the model is in and each color represents a different cluster. (D) Network graph generated off of the clustering done in the previous step. Thicker edges mean higher probability transitions between clusters and node sizes scale with the probability of each phenotype in steady state.](fig2.png)
 
 Helps reproducibility
 ---------------------
